@@ -49,8 +49,55 @@ Sem isso as peças entram com o fundo do quarto e o grid perde o visual de catá
 4. **Reinicie o servidor** (Ctrl+C e `npx expo start` de novo). Variáveis `EXPO_PUBLIC_*`
    são embutidas no bundle, então não valem sem reiniciar.
 
+5. Para a **versão publicada** funcionar, a chave também precisa estar no EAS — o
+   `eas update` lê variáveis do ambiente do EAS, não do `.env` local:
+
+   ```bash
+   npx eas-cli env:push production --path .env --force
+   ```
+
 O `.env` está no `.gitignore`. Peças cadastradas antes da chave podem ser reprocessadas:
 abra a peça no closet e toque em **Remover o fundo desta foto**.
+
+Fotos de iPhone chegam em HEIC, que a remove.bg recusa; o app converte para JPEG
+(máx. 1600px) antes de enviar, em `src/lib/media.ts`.
+
+---
+
+## Publicar (usar sem o PC ligado)
+
+O app está publicado com EAS Update em [`@ref_1012/bicloset`](https://expo.dev/accounts/ref_1012/projects/bicloset).
+Abre no Expo Go direto da nuvem:
+
+```
+exp://u.expo.dev/8a65535f-f740-48b0-a1d5-ebdbebbb742e?channel-name=production
+```
+
+Para publicar uma versão nova:
+
+```bash
+npx eas-cli update --branch production --message "o que mudou" --environment production --platform ios
+```
+
+Quem abrir o app recebe na próxima vez que fechar e abrir.
+
+Três detalhes que quebram se forem mexidos:
+
+- **`runtimeVersion` precisa ser `"exposdk:57.0.0"`** em `app.json`. O Expo Go só
+  carrega updates com o runtime da SDK dele. A policy `appVersion` que o
+  `eas update:configure` deixa por padrão só serve para build standalone.
+- **`web.output` precisa ser `"single"`**. Com `"static"` o export renderiza em Node e
+  quebra com `window is not defined`.
+- **O canal `production` precisa existir** e apontar para a branch de mesmo nome,
+  senão o manifest responde 404 (`eas channel:create production`).
+
+### Ícone na tela inicial
+
+Pelo Expo Go não existe ícone nativo. O contorno é o app **Atalhos**: nova ação
+"Abrir URL" com a URL acima, salvar, e no menu de compartilhar escolher
+"Adicionar à Tela de Início". Um toque abre o app.
+
+Ícone nativo de verdade exige conta paga da Apple (US$ 99/ano) e build via EAS.
 
 ---
 
@@ -64,7 +111,7 @@ abra a peça no closet e toque em **Remover o fundo desta foto**.
 | **Prova virtual** | Monta o look sobre a sua foto de referência e salva como look |
 | **Agenda** | Calendário mensal, agenda look por dia/evento e confirma o uso |
 | **Explorar** | Grade de combinações sugeridas a partir do closet atual |
-| **Perfil** | Avatar, nome, período de lavagem, peças mais usadas, closet de exemplo |
+| **Perfil** | Avatar, nome, período de lavagem, saldo de recortes, backup, peças mais usadas |
 
 ### Disponibilidade de peça (lavanderia)
 
@@ -82,6 +129,21 @@ Detalhe de implementação: `lastWornAt` e `wearCount` são **cache derivado**. 
 verdade são as entradas de calendário confirmadas, e tudo é recalculado a partir delas
 (`recomputeWear` em [`src/store/useAppStore.ts`](src/store/useAppStore.ts)). Por isso
 desfazer um "usei" devolve a peça imediatamente, sem contador dessincronizado.
+
+---
+
+### Backup do closet
+
+**Perfil → Backup → Exportar closet** gera um arquivo único com peças, looks, agenda
+e as fotos embutidas em base64, e abre a folha de compartilhamento do iOS (Arquivos,
+iCloud, WhatsApp, e-mail). **Restaurar backup** lê o arquivo de volta.
+
+As fotos vão dentro do arquivo de propósito: caminho de arquivo muda entre aparelhos
+e entre reinstalações, então guardar só o caminho daria um backup que restaura peças
+sem imagem.
+
+Isso importa mais do que parece: rodando no Expo Go, os dados vivem **dentro do Expo
+Go**. Apagar ou reinstalar o Expo Go leva o closet junto.
 
 ---
 
@@ -175,15 +237,14 @@ O wordmark serifado vem do app publicado na App Store. O case original tem 4 aba
 
 ## Próximos passos sugeridos
 
-1. **Trocar o mock de try-on por Replicate** — é o que mais muda a percepção do app.
-2. **Backend para sincronizar entre dispositivos** — hoje tudo é local; trocar de celular
-   perde o closet. Supabase resolveria dados + storage de imagem de uma vez.
-3. **Exportar/importar o closet** como JSON, como rede de segurança antes do backend.
-4. **Detecção automática de categoria e cor** na hora do upload (é o que o app original
-   faz e o que mais economiza toque na tela).
-5. **Notificação** no fim do dia perguntando se usou o look planejado — hoje a confirmação
-   depende de a pessoa abrir a Agenda.
-6. **Build standalone** com EAS quando quiser sair do Expo Go.
+1. **Trocar o mock de try-on por Replicate** — é a última feature ainda mockada.
+2. **Detecção automática de categoria e cor** no upload, para economizar toques.
+3. **Notificação** no fim do dia perguntando se usou o look planejado — hoje a
+   confirmação depende de abrir a Agenda.
+4. **Cadastro em lote** (seleção múltipla no picker), se o guarda-roupa crescer.
+5. **Backend para sincronizar entre aparelhos** — o backup em arquivo cobre a perda
+   de dados, mas não sincroniza dois celulares.
+6. **Build standalone** com EAS quando quiser sair do Expo Go (exige conta Apple paga).
 
 ---
 
