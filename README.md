@@ -1,0 +1,172 @@
+# bicloset
+
+Guarda-roupa digital com prova virtual, planejamento de looks e controle de lavanderia.
+App pessoal, React Native + Expo, roda no iPhone pelo Expo Go — sem Xcode, sem Mac, sem
+conta de desenvolvedor Apple.
+
+> Projeto independente. Não tem relação de código com `~/Documents/bicloset`, apesar do
+> mesmo nome.
+
+---
+
+## Como rodar
+
+```bash
+npm install
+```
+
+```bash
+npx expo start --tunnel
+```
+
+Depois:
+
+1. Instale o **Expo Go** no iPhone (App Store).
+2. Aponte a câmera do iPhone para o QR code do terminal (ou escaneie pelo próprio Expo Go).
+3. O app abre direto no Expo Go.
+
+`--tunnel` funciona mesmo que o computador e o iPhone estejam em redes diferentes. Se os
+dois estiverem no mesmo Wi-Fi, `npx expo start` sozinho é mais rápido.
+
+Para ver o app com conteúdo sem fotografar nada: **Perfil → Carregar closet de exemplo**
+(23 peças fictícias, desenhadas como silhuetas vetoriais).
+
+---
+
+## O que tem no app
+
+| Tela | O que faz |
+| --- | --- |
+| **Onboarding** | 3 passos, aparece só na primeira abertura |
+| **Home** | Look do dia sugerido, estatísticas do closet, ideias e looks recentes |
+| **Closet** | Grade de peças e de looks, busca, filtros por categoria/cor/estação/ocasião |
+| **Prova virtual** | Monta o look sobre a sua foto de referência e salva como look |
+| **Agenda** | Calendário mensal, agenda look por dia/evento e confirma o uso |
+| **Explorar** | Grade de combinações sugeridas a partir do closet atual |
+| **Perfil** | Avatar, nome, período de lavagem, peças mais usadas, closet de exemplo |
+
+### Disponibilidade de peça (lavanderia)
+
+Ao confirmar **"usei este look"** numa data da Agenda, todas as peças daquele look ficam
+indisponíveis por um período configurável (padrão **7 dias**, ajustável em Perfil, 0 desliga).
+Enquanto isso elas:
+
+- aparecem esmaecidas no closet, com um selo `3d` indicando quanto falta;
+- somem da seleção de peças da prova virtual;
+- deixam de entrar nas sugestões de look.
+
+A peça volta sozinha quando o período passa — não existe ação de "tirar da lavanderia".
+
+Detalhe de implementação: `lastWornAt` e `wearCount` são **cache derivado**. A fonte da
+verdade são as entradas de calendário confirmadas, e tudo é recalculado a partir delas
+(`recomputeWear` em [`src/store/useAppStore.ts`](src/store/useAppStore.ts)). Por isso
+desfazer um "usei" devolve a peça imediatamente, sem contador dessincronizado.
+
+---
+
+## O que está mockado vs. real
+
+**Real (roda de verdade, offline, sem chave de API):**
+
+- Todo o CRUD de peças, looks e agenda, persistido localmente com AsyncStorage.
+- Cálculo de disponibilidade / período de lavagem.
+- Motor de sugestão de looks — [`src/services/stylist.ts`](src/services/stylist.ts).
+  Pontua combinações por ocasião, estação, harmonia de cor e frescor (peças menos usadas
+  primeiro). É heurística local, não é um modelo de IA.
+- Composição visual do look — [`src/components/TryOnCanvas.tsx`](src/components/TryOnCanvas.tsx).
+  Sobrepõe as peças na foto de referência por zona do corpo (torso, pernas, pés).
+
+**Mockado (precisa de chave de API para virar real):**
+
+| O quê | Arquivo | O que trocar |
+| --- | --- | --- |
+| **Prova virtual com IA** | [`src/services/tryOn.ts`](src/services/tryOn.ts) | Corpo de `generateTryOn`. Sugestão: Replicate (`cuuupid/idm-vton` ou similar). Devolver `compositeUri` preenchido e `mocked: false` — nenhuma tela precisa mudar. |
+| **Remoção de fundo** | [`src/services/backgroundRemoval.ts`](src/services/backgroundRemoval.ts) | Corpo de `removeBackground`. Sugestão: remove.bg ou um modelo de segmentação no Replicate. |
+
+Os dois arquivos já têm a assinatura final (`foto da pessoa + peças → imagem combinada`),
+o exemplo de request comentado e um `TODO` marcando o ponto exato. Enquanto estiverem
+mockados, a UI mostra o selo **Preview** e um aviso explícito — nada finge ter passado por IA.
+
+Chaves ficariam em `.env` como `EXPO_PUBLIC_REPLICATE_TOKEN` / `EXPO_PUBLIC_REMOVE_BG_KEY`.
+Para uso pessoal está ok; num app distribuído as chamadas deveriam passar por um backend
+próprio, porque `EXPO_PUBLIC_*` vai embutido no bundle.
+
+---
+
+## Stack
+
+- **Expo SDK 57** + **Expo Router** (rotas por arquivo, em `src/app`)
+- **TypeScript** estrito
+- **Zustand** + `persist` sobre **AsyncStorage** (offline, sem backend)
+- **react-native-reanimated** para as transições
+- **react-native-svg** para as silhuetas de peça
+- **lucide-react-native** para ícones
+- **Inter** + **Playfair Display** via `@expo-google-fonts`
+
+### Estrutura
+
+```
+src/
+  app/              rotas (expo-router)
+    (tabs)/         Home, Closet, Prova virtual, Agenda, Perfil
+    add-item.tsx    fluxo de cadastro de peça
+    explore.tsx     sugestões de look
+    outfit/[id].tsx detalhe do look
+    onboarding.tsx
+  components/       UI compartilhada (ui/ = primitivos)
+  services/         tryOn, backgroundRemoval (mockados) e stylist (local)
+  store/            estado global e tipos
+  lib/              datas, disponibilidade, mídia, seed
+  theme/            tokens.ts e typography.ts
+```
+
+Nenhum estilo inline solto: cores, espaçamentos, raios e tipografia saem de
+[`src/theme/tokens.ts`](src/theme/tokens.ts) e [`src/theme/typography.ts`](src/theme/typography.ts).
+
+### Design
+
+Linguagem visual tirada do case [Closetly — AI-Powered Virtual Wardrobe App](https://www.behance.net/gallery/240575227/Closetly-AI-Powered-Virtual-Wardrobe-App)
+(Andrey Klimenkov): fundo cinza neutro, cards brancos bem arredondados, CTAs em pílula
+grafite, chips com borda fina e estado selecionado sólido, barra de abas flutuante.
+O wordmark serifado vem do app publicado na App Store. O case original tem 4 abas
+(Home / Closet / Try On / Profile); aqui são 5, porque a Agenda é uma tela própria.
+
+---
+
+## Trocar nome e ícone
+
+- **Nome, slug e scheme:** `app.json` → `expo.name`, `expo.slug`, `expo.scheme`.
+- **Ícone:** substitua `assets/images/icon.png` (1024×1024). O ícone atual é o
+  placeholder do template Expo — provisório.
+- **Splash:** `assets/images/splash-icon.png` e a cor em `expo.plugins` → `expo-splash-screen`.
+- **Wordmark dentro do app:** a string `bicloset` na Home
+  ([`src/app/(tabs)/index.tsx`](src/app/(tabs)/index.tsx)) e no
+  [onboarding](src/app/onboarding.tsx).
+
+---
+
+## Próximos passos sugeridos
+
+1. **Trocar o mock de try-on por Replicate** — é o que mais muda a percepção do app.
+2. **Remoção de fundo real** — sem ela as fotos entram com o fundo do quarto e a grade
+   perde o visual de catálogo.
+3. **Backend para sincronizar entre dispositivos** — hoje tudo é local; trocar de celular
+   perde o closet. Supabase resolveria dados + storage de imagem de uma vez.
+4. **Exportar/importar o closet** como JSON, como rede de segurança antes do backend.
+5. **Detecção automática de categoria e cor** na hora do upload (é o que o app original
+   faz e o que mais economiza toque na tela).
+6. **Notificação** no fim do dia perguntando se usou o look planejado — hoje a confirmação
+   depende de a pessoa abrir a Agenda.
+7. **Build standalone** com EAS quando quiser sair do Expo Go.
+
+---
+
+## Scripts
+
+```bash
+npx tsc --noEmit
+```
+
+```bash
+npm run lint
+```
