@@ -26,7 +26,8 @@ Depois:
 3. O app abre direto no Expo Go.
 
 `--tunnel` funciona mesmo que o computador e o iPhone estejam em redes diferentes. Se os
-dois estiverem no mesmo Wi-Fi, `npx expo start` sozinho é mais rápido.
+dois estiverem no mesmo Wi-Fi, `npx expo start` sozinho é mais rápido. O `@expo/ngrok`
+que o tunnel exige já está como devDependency, então não pede instalação global.
 
 Para ver o app com conteúdo sem fotografar nada: **Perfil → Carregar closet de exemplo**
 (23 peças fictícias, desenhadas como silhuetas vetoriais).

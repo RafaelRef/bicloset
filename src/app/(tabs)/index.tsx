@@ -8,7 +8,7 @@ import {
   Sparkles,
   WashingMachine,
 } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -73,8 +73,14 @@ export default function HomeScreen() {
 
   const recentOutfits = useMemo(() => outfits.slice(0, 6), [outfits]);
 
-  const saveFeatured = () => {
-    if (!featured) return;
+  // Uma sugestao vira um unico look salvo, mesmo que a pessoa toque em
+  // "Abrir look" e depois em "Usei hoje" — senao acumula duplicata.
+  const savedBySuggestion = useRef(new Map<string, string>());
+
+  const ensureOutfit = (): string | null => {
+    if (!featured) return null;
+    const existing = savedBySuggestion.current.get(featured.id);
+    if (existing && outfits.some((o) => o.id === existing)) return existing;
     const outfit = addOutfit({
       name: `Look ${featured.label.toLowerCase()}`,
       itemIds: featured.itemIds,
@@ -82,19 +88,18 @@ export default function HomeScreen() {
       occasion: featured.occasion,
       source: 'ai',
     });
-    router.push(`/outfit/${outfit.id}` as never);
+    savedBySuggestion.current.set(featured.id, outfit.id);
+    return outfit.id;
+  };
+
+  const saveFeatured = () => {
+    const outfitId = ensureOutfit();
+    if (outfitId) router.push(`/outfit/${outfitId}` as never);
   };
 
   const wearFeatured = () => {
-    if (!featured) return;
-    const outfit = addOutfit({
-      name: `Look ${featured.label.toLowerCase()}`,
-      itemIds: featured.itemIds,
-      personUri: modelPhotoUri,
-      occasion: featured.occasion,
-      source: 'ai',
-    });
-    wearOutfitToday(outfit.id);
+    const outfitId = ensureOutfit();
+    if (outfitId) wearOutfitToday(outfitId);
   };
 
   return (
