@@ -6,12 +6,14 @@ import {
   Info,
   Minus,
   Plus,
+  RefreshCw,
   Sparkles,
   Trash2,
   User,
+  Wand,
   WashingMachine,
 } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Pressable,
@@ -29,9 +31,16 @@ import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { getAvailability } from '@/lib/availability';
 import { persistImage } from '@/lib/media';
 import { buildDemoCloset } from '@/lib/seed';
+import {
+  fetchRemoveBgQuota,
+  type RemoveBgQuota,
+} from '@/services/backgroundRemoval';
 import { useAppStore } from '@/store/useAppStore';
 import { colors, radius, shadow, space, TAB_BAR_HEIGHT } from '@/theme/tokens';
 import { fonts, type as typeStyles } from '@/theme/typography';
+
+/** Cota do plano gratuito da remove.bg, para a barra de saldo. */
+const FREE_CALLS_PER_MONTH = 50;
 
 export default function ProfileScreen() {
   const items = useAppStore((s) => s.items);
@@ -43,6 +52,16 @@ export default function ProfileScreen() {
   const clearWardrobe = useAppStore((s) => s.clearWardrobe);
 
   const [name, setName] = useState(settings.ownerName);
+  const [quota, setQuota] = useState<RemoveBgQuota | null>(null);
+
+  const loadQuota = useCallback(() => {
+    setQuota(null);
+    void fetchRemoveBgQuota().then(setQuota);
+  }, []);
+
+  useEffect(() => {
+    loadQuota();
+  }, [loadQuota]);
 
   const stats = useMemo(() => {
     const now = Date.now();
@@ -182,6 +201,70 @@ export default function ProfileScreen() {
             <View style={styles.divider} />
             <Text style={typeStyles.bodyMuted}>
               {stats.washing} peça{stats.washing === 1 ? '' : 's'} na lavanderia agora.
+            </Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(90).duration(400)}>
+          <Text style={[typeStyles.headline, styles.sectionTitle]}>Remoção de fundo</Text>
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <View style={styles.rowLeft}>
+                <Wand size={18} color={colors.ai} />
+                <View style={styles.rowText}>
+                  <Text style={typeStyles.label}>
+                    {quota == null
+                      ? 'Consultando saldo...'
+                      : !quota.configured
+                        ? 'Desligada'
+                        : quota.freeCallsLeft == null
+                          ? 'Saldo indisponível'
+                          : `${quota.freeCallsLeft} de ${FREE_CALLS_PER_MONTH} recortes`}
+                  </Text>
+                  <Text style={typeStyles.caption}>
+                    {quota == null
+                      ? 'Falando com a remove.bg'
+                      : !quota.configured
+                        ? 'Falta a chave da remove.bg no .env'
+                        : quota.freeCallsLeft == null
+                          ? 'Não deu para falar com a remove.bg agora'
+                          : quota.paidCredits > 0
+                            ? `grátis este mês · ${quota.paidCredits} créditos pagos`
+                            : 'grátis restantes este mês'}
+                  </Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={loadQuota}
+                style={styles.stepperButton}
+                accessibilityRole="button"
+                accessibilityLabel="Atualizar saldo"
+              >
+                <RefreshCw size={15} color={colors.ink} />
+              </Pressable>
+            </View>
+
+            {quota?.freeCallsLeft != null ? (
+              <View style={styles.quotaTrack}>
+                <View
+                  style={[
+                    styles.quotaFill,
+                    {
+                      width: `${Math.max(
+                        2,
+                        Math.min(100, (quota.freeCallsLeft / FREE_CALLS_PER_MONTH) * 100),
+                      )}%`,
+                    },
+                    quota.freeCallsLeft <= 5 && styles.quotaFillLow,
+                  ]}
+                />
+              </View>
+            ) : null}
+
+            <Text style={typeStyles.bodyMuted}>
+              {quota?.configured && quota.freeCallsLeft === 0
+                ? 'Sem recortes grátis até o mês virar. As fotos entram sem recorte e dá para reprocessar depois.'
+                : 'Cada foto nova gasta 1 recorte. O saldo grátis renova todo mês.'}
             </Text>
           </View>
         </Animated.View>
@@ -340,6 +423,20 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
+  },
+  quotaTrack: {
+    height: 6,
+    borderRadius: radius.pill,
+    backgroundColor: colors.track,
+    overflow: 'hidden',
+  },
+  quotaFill: {
+    height: '100%',
+    borderRadius: radius.pill,
+    backgroundColor: colors.ai,
+  },
+  quotaFillLow: {
+    backgroundColor: colors.laundry,
   },
   wornRow: {
     flexDirection: 'row',

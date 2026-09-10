@@ -29,6 +29,13 @@ export async function persistImage(uri: string): Promise<string> {
   }
 }
 
+/** Lê um arquivo de imagem local como base64, para enviar no corpo de uma API. */
+export async function readImageAsBase64(uri: string): Promise<string> {
+  return FileSystem.readAsStringAsync(uri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+}
+
 /** Grava um PNG devolvido em base64 (resposta da remove.bg) como arquivo. */
 export async function saveBase64Image(base64: string, ext = 'png'): Promise<string> {
   await ensureMediaDir();

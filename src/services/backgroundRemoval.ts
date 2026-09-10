@@ -1,4 +1,4 @@
-import { saveBase64Image } from '@/lib/media';
+import { readImageAsBase64, saveBase64Image } from '@/lib/media';
 
 /**
  * Remoção de fundo da foto da peça, via API da remove.bg.
@@ -33,14 +33,6 @@ export interface BackgroundRemovalResult {
   status: BackgroundRemovalStatus;
   /** Explicação curta para a UI. null quando deu certo. */
   message: string | null;
-}
-
-function mimeFor(uri: string): string {
-  const ext = uri.split('?')[0].split('.').pop()?.toLowerCase();
-  if (ext === 'png') return 'image/png';
-  if (ext === 'webp') return 'image/webp';
-  if (ext === 'heic' || ext === 'heif') return 'image/heic';
-  return 'image/jpeg';
 }
 
 /** Traduz o erro da API para algo acionável na tela. */
@@ -78,26 +70,27 @@ export async function removeBackground(
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const form = new FormData();
-    form.append('image_file', {
-      uri,
-      name: 'item.jpg',
-      type: mimeFor(uri),
-    } as unknown as Blob);
-    form.append('size', OUTPUT_SIZE);
-    form.append('format', 'png');
-    // Sem isso a peça sai com o fundo transparente cortado rente ao contorno.
-    form.append('crop', 'true');
+    // Corpo JSON com a imagem em base64, e não multipart: a FormData do React
+    // Native novo é spec-compliant e rejeita o objeto {uri, name, type} com
+    // "Unsupported FormDataPart implementation".
+    const imageBase64 = await readImageAsBase64(uri);
 
     const response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: {
         'X-Api-Key': apiKey,
+        'Content-Type': 'application/json',
         // Devolve base64 em JSON em vez de binário — mais simples de gravar
         // em arquivo no React Native.
         Accept: 'application/json',
       },
-      body: form,
+      body: JSON.stringify({
+        image_file_b64: imageBase64,
+        size: OUTPUT_SIZE,
+        format: 'png',
+        // Corta a imagem rente ao contorno da peça, sem a moldura vazia.
+        crop: true,
+      }),
       signal: controller.signal,
     });
 
@@ -129,15 +122,66 @@ export async function removeBackground(
     const cutoutUri = await saveBase64Image(base64, 'png');
     return { uri: cutoutUri, status: 'removed', message: null };
   } catch (error) {
-    const aborted = error instanceof Error && error.name === 'AbortError';
+    const err = error as Error;
+    // Aparece no terminal do Metro — é o que diferencia timeout de falha de
+    // rede, de erro ao gravar o arquivo.
+    console.warn(
+      '[removeBackground] falhou:',
+      err?.name,
+      '|',
+      err?.message,
+      '| uri:',
+      uri.slice(0, 80),
+    );
+    const aborted = err?.name === 'AbortError';
     return {
       uri,
       status: 'failed',
       message: aborted
         ? 'A remove.bg demorou demais para responder. A foto entrou sem recorte.'
-        : 'Não deu para falar com a remove.bg agora. A foto entrou sem recorte.',
+        : `Não deu para falar com a remove.bg: ${err?.message ?? 'erro desconhecido'}`,
     };
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+export interface RemoveBgQuota {
+  /** false quando não há chave no .env. */
+  configured: boolean;
+  /** Chamadas grátis restantes no mês. null quando não deu para consultar. */
+  freeCallsLeft: number | null;
+  /** Créditos pagos (assinatura + avulsos). */
+  paidCredits: number;
+}
+
+/**
+ * Saldo da conta remove.bg. O endpoint `/account` não consome crédito, então
+ * dá para consultar sempre que a tela de perfil abrir.
+ */
+export async function fetchRemoveBgQuota(): Promise<RemoveBgQuota> {
+  const apiKey = process.env.EXPO_PUBLIC_REMOVE_BG_KEY;
+  if (!apiKey) {
+    return { configured: false, freeCallsLeft: null, paidCredits: 0 };
+  }
+
+  try {
+    const response = await fetch('https://api.remove.bg/v1.0/account', {
+      headers: { 'X-Api-Key': apiKey },
+    });
+    if (!response.ok) {
+      return { configured: true, freeCallsLeft: null, paidCredits: 0 };
+    }
+    const body = await response.json();
+    const attributes = body?.data?.attributes;
+    return {
+      configured: true,
+      freeCallsLeft: attributes?.api?.free_calls ?? null,
+      paidCredits:
+        (attributes?.credits?.subscription ?? 0) + (attributes?.credits?.payg ?? 0),
+    };
+  } catch (error) {
+    console.warn('[fetchRemoveBgQuota] falhou:', (error as Error)?.message);
+    return { configured: true, freeCallsLeft: null, paidCredits: 0 };
   }
 }
