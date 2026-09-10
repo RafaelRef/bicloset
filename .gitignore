@@ -45,3 +45,6 @@ example
 
 # Saida do expo export usada so para validar o bundle
 .export-check/
+
+# Saida do expo export / eas update
+dist/
