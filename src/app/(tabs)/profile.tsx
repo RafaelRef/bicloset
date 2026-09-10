@@ -2,11 +2,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import {
+  Archive,
   ChevronRight,
+  Download,
   Info,
   Minus,
   Plus,
   RefreshCw,
+  Share2,
   Sparkles,
   Trash2,
   User,
@@ -29,6 +32,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GarmentGlyph } from '@/components/GarmentGlyph';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { getAvailability } from '@/lib/availability';
+import { exportBackup, importBackup } from '@/lib/backup';
 import { persistImage } from '@/lib/media';
 import { buildDemoCloset } from '@/lib/seed';
 import {
@@ -50,9 +54,11 @@ export default function ProfileScreen() {
   const updateSettings = useAppStore((s) => s.updateSettings);
   const addItem = useAppStore((s) => s.addItem);
   const clearWardrobe = useAppStore((s) => s.clearWardrobe);
+  const replaceAll = useAppStore((s) => s.replaceAll);
 
   const [name, setName] = useState(settings.ownerName);
   const [quota, setQuota] = useState<RemoveBgQuota | null>(null);
+  const [busy, setBusy] = useState<'export' | 'import' | null>(null);
 
   const loadQuota = useCallback(() => {
     setQuota(null);
@@ -109,6 +115,70 @@ export default function ProfileScreen() {
           text: 'Carregar',
           onPress: () => {
             for (const demo of buildDemoCloset()) addItem(demo);
+          },
+        },
+      ],
+    );
+  };
+
+  const handleExport = async () => {
+    if (items.length === 0) {
+      Alert.alert('Closet vazio', 'Cadastre ao menos uma peça antes de exportar.');
+      return;
+    }
+    setBusy('export');
+    try {
+      const result = await exportBackup({ items, outfits, plans, settings });
+      if (!result.shared) {
+        Alert.alert(
+          'Backup gerado',
+          `Arquivo de ${result.sizeMb.toFixed(1)} MB salvo em:\n${result.path}`,
+        );
+      }
+    } catch (error) {
+      Alert.alert('Não deu para exportar', (error as Error)?.message ?? 'Erro desconhecido');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleImport = () => {
+    Alert.alert(
+      'Restaurar backup',
+      'Isso substitui o closet atual por completo — peças, looks e agenda. Não dá para desfazer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Escolher arquivo',
+          style: 'destructive',
+          onPress: async () => {
+            setBusy('import');
+            try {
+              const outcome = await importBackup();
+              if (outcome.status === 'canceled') return;
+              if (outcome.status === 'invalid') {
+                Alert.alert('Backup inválido', outcome.message);
+                return;
+              }
+              replaceAll({
+                items: outcome.payload.items,
+                outfits: outcome.payload.outfits,
+                plans: outcome.payload.plans,
+              });
+              updateSettings(outcome.payload.settings);
+              setName(outcome.payload.settings.ownerName);
+              Alert.alert(
+                'Backup restaurado',
+                `${outcome.counts.items} peças e ${outcome.counts.outfits} looks voltaram.`,
+              );
+            } catch (error) {
+              Alert.alert(
+                'Não deu para importar',
+                (error as Error)?.message ?? 'Erro desconhecido',
+              );
+            } finally {
+              setBusy(null);
+            }
           },
         },
       ],
@@ -305,6 +375,44 @@ export default function ProfileScreen() {
           </View>
         </Animated.View>
 
+        <Animated.View entering={FadeInDown.delay(150).duration(400)}>
+          <Text style={[typeStyles.headline, styles.sectionTitle]}>Backup</Text>
+          <View style={styles.card}>
+            <Pressable
+              style={styles.actionRow}
+              onPress={handleExport}
+              disabled={busy != null}
+            >
+              <Share2 size={17} color={colors.ink} />
+              <Text style={styles.actionLabel}>
+                {busy === 'export' ? 'Preparando arquivo...' : 'Exportar closet'}
+              </Text>
+              <ChevronRight size={17} color={colors.inkFaint} />
+            </Pressable>
+            <View style={styles.divider} />
+            <Pressable
+              style={styles.actionRow}
+              onPress={handleImport}
+              disabled={busy != null}
+            >
+              <Download size={17} color={colors.ink} />
+              <Text style={styles.actionLabel}>
+                {busy === 'import' ? 'Restaurando...' : 'Restaurar backup'}
+              </Text>
+              <ChevronRight size={17} color={colors.inkFaint} />
+            </Pressable>
+            <View style={styles.divider} />
+            <View style={styles.rowLeft}>
+              <Archive size={15} color={colors.inkSoft} />
+              <Text style={[typeStyles.caption, styles.backupHint]}>
+                O arquivo leva as peças, os looks, a agenda e as fotos. Guarde em
+                Arquivos ou iCloud — rodando no Expo Go, apagar o Expo Go apaga o
+                closet junto.
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
+
         <Animated.View entering={FadeInDown.delay(180).duration(400)}>
           <Text style={[typeStyles.headline, styles.sectionTitle]}>Closet</Text>
           <View style={styles.card}>
@@ -423,6 +531,10 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
+  },
+  backupHint: {
+    flex: 1,
+    lineHeight: 16,
   },
   quotaTrack: {
     height: 6,
