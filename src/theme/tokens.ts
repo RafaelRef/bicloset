@@ -21,7 +21,7 @@ export const colors = {
   ink: '#1C1C1C',
   /** Texto secundario */
   inkSoft: '#6B6B6B',
-  /** Texto terciario, placeholders, icones inativos */
+  /** Texto terciario, placeholders, ícones inativos */
   inkFaint: '#A2A2A2',
   /** Texto sobre superficies escuras */
   onInk: '#FFFFFF',
@@ -40,12 +40,12 @@ export const colors = {
   laundry: '#B0793C',
   laundryTint: '#F6E7D3',
 
-  /** Realce de IA / sugestoes */
+  /** Realce de IA / sugestões */
   ai: '#6B72C4',
   aiTint: '#ECEDF8',
 } as const;
 
-/** Paleta de cores atribuiveis a uma peca. */
+/** Paleta de cores atribuiveis a uma peça. */
 export const garmentColors = {
   black: { label: 'Preto', hex: '#1C1C1C' },
   grey: { label: 'Cinza', hex: '#9A9A9A' },

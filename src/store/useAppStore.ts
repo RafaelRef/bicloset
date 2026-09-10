@@ -16,8 +16,8 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 /**
- * `lastWornAt` e `wearCount` sao cache derivado: a verdade sao as entradas do
- * calendario confirmadas como usadas. Recalcular a partir delas deixa o
+ * `lastWornAt` e `wearCount` são cache derivado: a verdade são as entradas do
+ * calendário confirmadas como usadas. Recalcular a partir delas deixa o
  * desfazer correto de graca e evita contadores dessincronizados.
  */
 function recomputeWear(
@@ -86,9 +86,9 @@ export interface AppState {
     eventLabel?: string | null;
   }): PlanEntry;
   removePlan(id: string): void;
-  /** Gatilho do periodo de lavagem. */
+  /** Gatilho do período de lavagem. */
   setPlanWorn(id: string, worn: boolean): void;
-  /** Atalho de usei esse look hoje, fora do calendario. */
+  /** Atalho de usei esse look hoje, fora do calendário. */
   wearOutfitToday(outfitId: string): void;
 
   updateSettings(patch: Partial<Settings>): void;
@@ -135,7 +135,7 @@ export const useAppStore = create<AppState>()(
           if (item.originalUri !== item.imageUri) void deleteImage(item.originalUri);
         }
         set((s) => {
-          // Looks que ficariam vazios sem a peca saem junto, com seus planos.
+          // Looks que ficariam vazios sem a peça saem junto, com seus planos.
           const outfits = s.outfits
             .map((o) => ({ ...o, itemIds: o.itemIds.filter((i) => i !== id) }))
             .filter((o) => o.itemIds.length > 0);
@@ -206,8 +206,8 @@ export const useAppStore = create<AppState>()(
           const plans = s.plans.map((p) => {
             if (p.id !== id) return p;
             if (!worn) return { ...p, worn: false, confirmedAt: null };
-            // Confirmar um look planejado para o futuro comeca a contagem
-            // agora, nunca numa data que ainda nao chegou.
+            // Confirmar um look planejado para o futuro começa a contagem
+            // agora, nunca numa data que ainda não chegou.
             const planned = keyToDate(p.date);
             planned.setHours(12, 0, 0, 0);
             const at = Math.min(planned.getTime(), Date.now());
@@ -259,7 +259,7 @@ export const useAppStore = create<AppState>()(
       onRehydrateStorage: () => (state) => {
         useAppStore.setState({ hydrated: true });
         if (state) {
-          // Recalcula na abertura: o periodo de lavagem depende do relogio.
+          // Recalcula na abertura: o período de lavagem depende do relogio.
           const { items, outfits } = recomputeWear(state.items, state.outfits, state.plans);
           useAppStore.setState({ items, outfits });
         }
@@ -268,7 +268,7 @@ export const useAppStore = create<AppState>()(
   ),
 );
 
-/** Ocasiao padrao sugerida ao salvar um look novo. */
+/** Ocasião padrão sugerida ao salvar um look novo. */
 export function defaultOccasion(): Occasion {
   return [0, 6].includes(new Date().getDay()) ? 'casual' : 'work';
 }

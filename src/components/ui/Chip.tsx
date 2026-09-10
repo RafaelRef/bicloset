@@ -40,7 +40,7 @@ export function Chip({ label, selected, onPress, leading, compact }: ChipProps) 
   );
 }
 
-/** Linha de chips com rolagem horizontal e sangria ate a borda da tela. */
+/** Linha de chips com rolagem horizontal e sangria até a borda da tela. */
 export function ChipRow({
   children,
   paddingHorizontal = space.xl,
@@ -59,7 +59,7 @@ export function ChipRow({
   );
 }
 
-/** Bolinha de cor usada nos filtros e no formulario da peca. */
+/** Bolinha de cor usada nos filtros e no formulario da peça. */
 export function ColorDot({ hex, size = 14 }: { hex: string; size?: number }) {
   return (
     <View

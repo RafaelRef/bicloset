@@ -119,7 +119,7 @@ export default function PlanScreen() {
           <View style={styles.monthRow}>
             <IconCircle
               icon={<ChevronLeft size={18} color={colors.ink} />}
-              accessibilityLabel="Mes anterior"
+              accessibilityLabel="Mês anterior"
               onPress={() => shiftMonth(-1)}
             />
             <Text style={typeStyles.headline}>
@@ -127,7 +127,7 @@ export default function PlanScreen() {
             </Text>
             <IconCircle
               icon={<ChevronRight size={18} color={colors.ink} />}
-              accessibilityLabel="Proximo mes"
+              accessibilityLabel="Próximo mês"
               onPress={() => shiftMonth(1)}
             />
           </View>
@@ -253,7 +253,7 @@ export default function PlanScreen() {
                         <View style={styles.wornBadge}>
                           <WashingMachine size={11} color={colors.laundry} />
                           <Text style={styles.wornText}>
-                            Pecas na lavanderia por {laundryDays} dias
+                            Peças na lavanderia por {laundryDays} dias
                           </Text>
                         </View>
                       ) : null}
@@ -262,7 +262,7 @@ export default function PlanScreen() {
                       onPress={() => removePlan(plan.id)}
                       hitSlop={10}
                       accessibilityRole="button"
-                      accessibilityLabel="Remover do calendario"
+                      accessibilityLabel="Remover do calendário"
                     >
                       <Trash2 size={16} color={colors.inkFaint} />
                     </Pressable>
@@ -293,7 +293,7 @@ export default function PlanScreen() {
           <TextInput
             value={eventLabel}
             onChangeText={setEventLabel}
-            placeholder="Jantar, reuniao, viagem..."
+            placeholder="Jantar, reunião, viagem..."
             placeholderTextColor={colors.inkFaint}
             style={styles.input}
           />
@@ -303,7 +303,7 @@ export default function PlanScreen() {
           <Text style={typeStyles.section}>Escolha um look</Text>
           {outfits.length === 0 ? (
             <Text style={typeStyles.bodyMuted}>
-              Voce ainda nao salvou nenhum look. Monte um na prova virtual.
+              Você ainda não salvou nenhum look. Monte um na prova virtual.
             </Text>
           ) : (
             <View style={styles.outfitList}>
@@ -325,7 +325,7 @@ export default function PlanScreen() {
                       {outfit.name}
                     </Text>
                     <Text style={typeStyles.caption}>
-                      {outfit.itemIds.length} pecas · usado {outfit.wearCount}x
+                      {outfit.itemIds.length} peças · usado {outfit.wearCount}x
                     </Text>
                   </View>
                   <ChevronRight size={18} color={colors.inkFaint} />

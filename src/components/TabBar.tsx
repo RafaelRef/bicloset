@@ -30,8 +30,8 @@ const TABS: Tab[] = [
 ];
 
 /**
- * Barra flutuante do case: pilula clara sobreposta ao conteudo, icone + rotulo,
- * item ativo em grafite. Navega pelo router para nao depender do formato de
+ * Barra flutuante do case: pilula clara sobreposta ao conteudo, ícone + rótulo,
+ * item ativo em grafite. Navega pelo router para não depender do formato de
  * `navigation` exposto pelo navigator.
  */
 export function TabBar({

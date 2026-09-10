@@ -56,8 +56,8 @@ export default function OutfitScreen() {
         />
         <EmptyState
           icon={<Trash2 size={30} color={colors.inkFaint} strokeWidth={1.5} />}
-          title="Look nao encontrado"
-          description="Ele pode ter sido removido junto com uma das pecas."
+          title="Look não encontrado"
+          description="Ele pode ter sido removido junto com uma das peças."
           actionLabel="Voltar ao closet"
           onAction={() => router.replace('/closet' as never)}
         />
@@ -139,10 +139,10 @@ export default function OutfitScreen() {
           <Text style={typeStyles.bodyMuted}>
             {[
               occasionLabel,
-              `${outfitItems.length} pecas`,
+              `${outfitItems.length} peças`,
               outfit.wearCount > 0 ? `usado ${outfit.wearCount}x` : 'nunca usado',
               outfit.lastWornAt
-                ? `ultima vez ${friendlyDate(new Date(outfit.lastWornAt)).toLowerCase()}`
+                ? `última vez ${friendlyDate(new Date(outfit.lastWornAt)).toLowerCase()}`
                 : null,
             ]
               .filter(Boolean)
@@ -168,13 +168,13 @@ export default function OutfitScreen() {
 
         <View style={styles.laundryNote}>
           <Text style={typeStyles.caption}>
-            Ao marcar como usado, as {outfitItems.length} pecas ficam indisponiveis por{' '}
+            Ao marcar como usado, as {outfitItems.length} peças ficam indisponíveis por{' '}
             {laundryDays} dias.
           </Text>
         </View>
 
         <View>
-          <Text style={[typeStyles.headline, styles.sectionTitle]}>Pecas do look</Text>
+          <Text style={[typeStyles.headline, styles.sectionTitle]}>Peças do look</Text>
           <View style={styles.grid}>
             {outfitItems.map((item) => (
               <ItemCard

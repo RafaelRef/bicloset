@@ -121,7 +121,7 @@ export default function ClosetScreen() {
     <View>
       <Segmented
         options={[
-          { key: 'items' as const, label: 'Pecas' },
+          { key: 'items' as const, label: 'Peças' },
           { key: 'outfits' as const, label: 'Looks' },
         ]}
         value={tab}
@@ -165,7 +165,7 @@ export default function ClosetScreen() {
           {tab === 'items' ? (
             <>
               <Chip
-                label="Disponiveis"
+                label="Disponíveis"
                 selected={quick === 'available'}
                 onPress={() => setQuick(quick === 'available' ? 'all' : 'available')}
               />
@@ -214,7 +214,7 @@ export default function ClosetScreen() {
               </Pressable>
             ) : null}
             <PillButton
-              label="Peca"
+              label="Peça"
               icon={<Plus size={15} color={colors.onInk} />}
               tone="dark"
               onPress={() => router.push('/add-item' as never)}
@@ -249,9 +249,9 @@ export default function ClosetScreen() {
             items.length === 0 ? (
               <EmptyState
                 icon={<Shirt size={34} color={colors.inkFaint} strokeWidth={1.5} />}
-                title="Nenhuma peca ainda"
-                description="Fotografe suas roupas ou escolha da galeria. Cada peca entra com categoria, cor e ocasiao."
-                actionLabel="Adicionar primeira peca"
+                title="Nenhuma peça ainda"
+                description="Fotografe suas roupas ou escolha da galeria. Cada peça entra com categoria, cor e ocasião."
+                actionLabel="Adicionar primeira peça"
                 onAction={() => router.push('/add-item' as never)}
               />
             ) : (
@@ -297,7 +297,7 @@ export default function ClosetScreen() {
             <EmptyState
               icon={<Sparkles size={32} color={colors.inkFaint} strokeWidth={1.5} />}
               title="Nenhum look salvo"
-              description="Monte uma combinacao na prova virtual ou salve uma sugestao da tela Explorar."
+              description="Monte uma combinação na prova virtual ou salve uma sugestão da tela Explorar."
               actionLabel="Ir para a prova virtual"
               onAction={() => router.push('/tryon' as never)}
             />
@@ -342,7 +342,7 @@ export default function ClosetScreen() {
         </View>
 
         <View style={styles.sheetSection}>
-          <Text style={typeStyles.section}>Estacao</Text>
+          <Text style={typeStyles.section}>Estação</Text>
           <View style={styles.wrap}>
             {SEASONS.map((season) => (
               <Chip
@@ -357,7 +357,7 @@ export default function ClosetScreen() {
         </View>
 
         <View style={styles.sheetSection}>
-          <Text style={typeStyles.section}>Ocasiao</Text>
+          <Text style={typeStyles.section}>Ocasião</Text>
           <View style={styles.wrap}>
             {OCCASIONS.map((occasion) => (
               <Chip

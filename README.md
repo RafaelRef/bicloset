@@ -32,6 +32,26 @@ que o tunnel exige já está como devDependency, então não pede instalação g
 Para ver o app com conteúdo sem fotografar nada: **Perfil → Carregar closet de exemplo**
 (23 peças fictícias, desenhadas como silhuetas vetoriais).
 
+
+### Remoção de fundo das fotos (opcional, mas recomendado)
+
+Sem isso as peças entram com o fundo do quarto e o grid perde o visual de catálogo.
+
+1. Crie uma conta em [remove.bg](https://www.remove.bg/users/sign_up) — o plano grátis dá
+   **50 fotos por mês**, sem cartão.
+2. Pegue a chave em [remove.bg/api](https://www.remove.bg/api) → *API Key*.
+3. Na raiz do projeto, copie `.env.example` para `.env` e cole a chave:
+
+   ```
+   EXPO_PUBLIC_REMOVE_BG_KEY=sua_chave_aqui
+   ```
+
+4. **Reinicie o servidor** (Ctrl+C e `npx expo start` de novo). Variáveis `EXPO_PUBLIC_*`
+   são embutidas no bundle, então não valem sem reiniciar.
+
+O `.env` está no `.gitignore`. Peças cadastradas antes da chave podem ser reprocessadas:
+abra a peça no closet e toque em **Remover o fundo desta foto**.
+
 ---
 
 ## O que tem no app
@@ -77,20 +97,27 @@ desfazer um "usei" devolve a peça imediatamente, sem contador dessincronizado.
 - Composição visual do look — [`src/components/TryOnCanvas.tsx`](src/components/TryOnCanvas.tsx).
   Sobrepõe as peças na foto de referência por zona do corpo (torso, pernas, pés).
 
-**Mockado (precisa de chave de API para virar real):**
+**Real, mas depende de chave de API:**
+
+- **Remoção de fundo** — [`src/services/backgroundRemoval.ts`](src/services/backgroundRemoval.ts),
+  via [remove.bg](https://www.remove.bg/api). Liga sozinho assim que
+  `EXPO_PUBLIC_REMOVE_BG_KEY` existir no `.env` (veja a seção acima). Sem chave, ou se a
+  API falhar, a foto entra sem recorte e a tela diz exatamente o motivo — nunca finge
+  que processou.
+
+**Ainda mockado:**
 
 | O quê | Arquivo | O que trocar |
 | --- | --- | --- |
 | **Prova virtual com IA** | [`src/services/tryOn.ts`](src/services/tryOn.ts) | Corpo de `generateTryOn`. Sugestão: Replicate (`cuuupid/idm-vton` ou similar). Devolver `compositeUri` preenchido e `mocked: false` — nenhuma tela precisa mudar. |
-| **Remoção de fundo** | [`src/services/backgroundRemoval.ts`](src/services/backgroundRemoval.ts) | Corpo de `removeBackground`. Sugestão: remove.bg ou um modelo de segmentação no Replicate. |
 
-Os dois arquivos já têm a assinatura final (`foto da pessoa + peças → imagem combinada`),
-o exemplo de request comentado e um `TODO` marcando o ponto exato. Enquanto estiverem
-mockados, a UI mostra o selo **Preview** e um aviso explícito — nada finge ter passado por IA.
+O arquivo já tem a assinatura final (`foto da pessoa + peças → imagem combinada`), o
+exemplo de request comentado e um `TODO` marcando o ponto exato. Enquanto estiver
+mockado, a UI mostra o selo **Preview** e um aviso explícito.
 
-Chaves ficariam em `.env` como `EXPO_PUBLIC_REPLICATE_TOKEN` / `EXPO_PUBLIC_REMOVE_BG_KEY`.
-Para uso pessoal está ok; num app distribuído as chamadas deveriam passar por um backend
-próprio, porque `EXPO_PUBLIC_*` vai embutido no bundle.
+Nota de segurança: `EXPO_PUBLIC_*` é embutido no bundle, então a chave viaja com o app.
+Para uso pessoal está ok. Num app distribuído, as chamadas deveriam passar por um backend
+próprio para a chave não sair da sua máquina.
 
 ---
 
@@ -149,16 +176,14 @@ O wordmark serifado vem do app publicado na App Store. O case original tem 4 aba
 ## Próximos passos sugeridos
 
 1. **Trocar o mock de try-on por Replicate** — é o que mais muda a percepção do app.
-2. **Remoção de fundo real** — sem ela as fotos entram com o fundo do quarto e a grade
-   perde o visual de catálogo.
-3. **Backend para sincronizar entre dispositivos** — hoje tudo é local; trocar de celular
+2. **Backend para sincronizar entre dispositivos** — hoje tudo é local; trocar de celular
    perde o closet. Supabase resolveria dados + storage de imagem de uma vez.
-4. **Exportar/importar o closet** como JSON, como rede de segurança antes do backend.
-5. **Detecção automática de categoria e cor** na hora do upload (é o que o app original
+3. **Exportar/importar o closet** como JSON, como rede de segurança antes do backend.
+4. **Detecção automática de categoria e cor** na hora do upload (é o que o app original
    faz e o que mais economiza toque na tela).
-6. **Notificação** no fim do dia perguntando se usou o look planejado — hoje a confirmação
+5. **Notificação** no fim do dia perguntando se usou o look planejado — hoje a confirmação
    depende de a pessoa abrir a Agenda.
-7. **Build standalone** com EAS quando quiser sair do Expo Go.
+6. **Build standalone** com EAS quando quiser sair do Expo Go.
 
 ---
 

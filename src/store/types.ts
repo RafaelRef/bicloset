@@ -17,7 +17,7 @@ export const CATEGORIES: { key: Category; label: string }[] = [
   { key: 'dresses', label: 'Vestidos' },
   { key: 'outerwear', label: 'Casacos' },
   { key: 'shoes', label: 'Sapatos' },
-  { key: 'accessories', label: 'Acessorios' },
+  { key: 'accessories', label: 'Acessórios' },
 ];
 
 export const OCCASIONS: { key: Occasion; label: string }[] = [
@@ -29,7 +29,7 @@ export const OCCASIONS: { key: Occasion; label: string }[] = [
 ];
 
 export const SEASONS: { key: Season; label: string }[] = [
-  { key: 'summer', label: 'Verao' },
+  { key: 'summer', label: 'Verão' },
   { key: 'autumn', label: 'Outono' },
   { key: 'winter', label: 'Inverno' },
   { key: 'spring', label: 'Primavera' },
@@ -42,11 +42,11 @@ export interface ClothingItem {
   colorKey: GarmentColorKey;
   occasions: Occasion[];
   seasons: Season[];
-  /** URI local da foto ja processada. null => renderiza a silhueta vetorial. */
+  /** URI local da foto já processada. null => renderiza a silhueta vetorial. */
   imageUri: string | null;
-  /** Foto original, antes da remocao de fundo. */
+  /** Foto original, antes da remoção de fundo. */
   originalUri: string | null;
-  /** true quando passou pelo servico de remocao de fundo (hoje mockado). */
+  /** true quando passou pelo serviço de remoção de fundo (hoje mockado). */
   bgRemoved: boolean;
   favorite: boolean;
   createdAt: number;
@@ -59,7 +59,7 @@ export interface Outfit {
   id: string;
   name: string;
   itemIds: string[];
-  /** Foto de referencia da pessoa usada na prova virtual, se houver. */
+  /** Foto de referência da pessoa usada na prova virtual, se houver. */
   personUri: string | null;
   occasion: Occasion | null;
   favorite: boolean;
@@ -75,7 +75,7 @@ export interface PlanEntry {
   date: string;
   outfitId: string;
   eventLabel: string | null;
-  /** Quando true, as pecas do look entraram no periodo de lavagem. */
+  /** Quando true, as peças do look entraram no período de lavagem. */
   worn: boolean;
   confirmedAt: number | null;
 }
@@ -85,7 +85,7 @@ export interface Settings {
   avatarUri: string | null;
   /** Foto de corpo inteiro usada como base da prova virtual. */
   modelPhotoUri: string | null;
-  /** Dias que uma peca fica indisponivel depois de usada. */
+  /** Dias que uma peça fica indisponível depois de usada. */
   laundryDays: number;
   onboarded: boolean;
 }

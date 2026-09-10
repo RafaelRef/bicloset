@@ -70,7 +70,8 @@ export default function AddItemScreen() {
     editing?.originalUri ?? null,
   );
   const [bgRemoved, setBgRemoved] = useState(editing?.bgRemoved ?? false);
-  const [mockedNotice, setMockedNotice] = useState(false);
+  /** Aviso quando o recorte nao aconteceu (sem chave, sem credito, erro). */
+  const [cutoutNotice, setCutoutNotice] = useState<string | null>(null);
 
   const [name, setName] = useState(editing?.name ?? '');
   const [category, setCategory] = useState<Category>(editing?.category ?? 'tops');
@@ -88,15 +89,30 @@ export default function AddItemScreen() {
     setOriginalUri(stored);
     const result = await removeBackground(stored);
     setImageUri(result.uri);
-    setBgRemoved(!result.mocked);
-    setMockedNotice(result.mocked);
+    setBgRemoved(result.status === 'removed');
+    setCutoutNotice(result.message);
+    setStep('form');
+  };
+
+  /**
+   * Reprocessa uma peça que já está no closet — serve para as que entraram
+   * antes da chave da remove.bg existir, sem precisar cadastrar de novo.
+   */
+  const retryCutout = async () => {
+    const source = originalUri ?? imageUri;
+    if (!source) return;
+    setStep('processing');
+    const result = await removeBackground(source);
+    setImageUri(result.uri);
+    setBgRemoved(result.status === 'removed');
+    setCutoutNotice(result.message);
     setStep('form');
   };
 
   const fromCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permissao necessaria', 'Libere o acesso a camera para fotografar a peca.');
+      Alert.alert('Permissão necessária', 'Libere o acesso à câmera para fotografar a peça.');
       return;
     }
     const picked = await ImagePicker.launchCameraAsync({ quality: 0.85 });
@@ -107,7 +123,7 @@ export default function AddItemScreen() {
   const fromGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permissao necessaria', 'Libere o acesso as fotos para escolher a peca.');
+      Alert.alert('Permissão necessária', 'Libere o acesso às fotos para escolher a peça.');
       return;
     }
     const picked = await ImagePicker.launchImageLibraryAsync({
@@ -140,7 +156,7 @@ export default function AddItemScreen() {
 
   const confirmDelete = () => {
     if (!editing) return;
-    Alert.alert('Remover peca', `"${editing.name}" sai do closet e dos looks salvos.`, [
+    Alert.alert('Remover peça', `"${editing.name}" sai do closet e dos looks salvos.`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Remover',
@@ -156,7 +172,7 @@ export default function AddItemScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScreenHeader
-        title={editing ? 'Editar peca' : 'Adicionar peca'}
+        title={editing ? 'Editar peça' : 'Adicionar peça'}
         left={
           <IconCircle
             icon={<X size={18} color={colors.ink} />}
@@ -168,7 +184,7 @@ export default function AddItemScreen() {
           editing ? (
             <IconCircle
               icon={<Trash2 size={16} color={colors.danger} />}
-              accessibilityLabel="Remover peca"
+              accessibilityLabel="Remover peça"
               onPress={confirmDelete}
             />
           ) : undefined
@@ -178,7 +194,7 @@ export default function AddItemScreen() {
       {step === 'source' ? (
         <Animated.View entering={FadeIn.duration(300)} style={styles.sourceWrap}>
           <Text style={[typeStyles.bodyMuted, styles.sourceIntro]}>
-            Fotografe a peca sobre um fundo liso, ou escolha uma imagem da galeria.
+            Fotografe a peça sobre um fundo liso, ou escolha uma imagem da galeria.
           </Text>
 
           <Pressable style={styles.sourceCard} onPress={fromCamera}>
@@ -187,7 +203,7 @@ export default function AddItemScreen() {
             </View>
             <View style={styles.sourceText}>
               <Text style={typeStyles.label}>Tirar foto</Text>
-              <Text style={typeStyles.caption}>Use a camera do celular</Text>
+              <Text style={typeStyles.caption}>Use a câmera do celular</Text>
             </View>
           </Pressable>
 
@@ -197,7 +213,7 @@ export default function AddItemScreen() {
             </View>
             <View style={styles.sourceText}>
               <Text style={typeStyles.label}>Escolher da galeria</Text>
-              <Text style={typeStyles.caption}>Fotos que ja estao no celular</Text>
+              <Text style={typeStyles.caption}>Fotos que já estão no celular</Text>
             </View>
           </Pressable>
 
@@ -208,7 +224,7 @@ export default function AddItemScreen() {
             <View style={styles.sourceText}>
               <Text style={typeStyles.label}>Sem foto</Text>
               <Text style={typeStyles.caption}>
-                A peca entra com uma silhueta na cor escolhida
+                A peça entra com uma silhueta na cor escolhida
               </Text>
             </View>
           </Pressable>
@@ -218,7 +234,7 @@ export default function AddItemScreen() {
       {step === 'processing' ? (
         <Animated.View entering={FadeIn.duration(300)} style={styles.processing}>
           <ActivityIndicator color={colors.ink} />
-          <Text style={typeStyles.label}>Recortando a peca...</Text>
+          <Text style={typeStyles.label}>Recortando a peça...</Text>
           <Text style={[typeStyles.bodyMuted, styles.processingHint]}>
             Separando a roupa do fundo da foto.
           </Text>
@@ -243,17 +259,21 @@ export default function AddItemScreen() {
               )}
             </Animated.View>
 
-            {mockedNotice ? (
+            {cutoutNotice ? (
               <View style={styles.notice}>
                 <Info size={14} color={colors.ai} />
-                <Text style={styles.noticeText}>
-                  A remocao de fundo esta mockada: a foto entrou como esta. Ative o
-                  servico real com uma chave de API (veja o README).
-                </Text>
+                <Text style={styles.noticeText}>{cutoutNotice}</Text>
               </View>
             ) : null}
 
-            {!imageUri && step === 'form' && !editing ? (
+            {imageUri && !bgRemoved ? (
+              <Pressable style={styles.addPhoto} onPress={retryCutout}>
+                <Wand size={15} color={colors.inkSoft} />
+                <Text style={typeStyles.caption}>Remover o fundo desta foto</Text>
+              </Pressable>
+            ) : null}
+
+            {!imageUri && !editing ? (
               <Pressable style={styles.addPhoto} onPress={() => setStep('source')}>
                 <Wand size={15} color={colors.inkSoft} />
                 <Text style={typeStyles.caption}>Adicionar uma foto</Text>
@@ -303,7 +323,7 @@ export default function AddItemScreen() {
             </View>
 
             <View style={styles.field}>
-              <Text style={typeStyles.section}>Ocasiao</Text>
+              <Text style={typeStyles.section}>Ocasião</Text>
               <View style={styles.wrap}>
                 {OCCASIONS.map((entry) => (
                   <Chip
@@ -317,7 +337,7 @@ export default function AddItemScreen() {
             </View>
 
             <View style={styles.field}>
-              <Text style={typeStyles.section}>Estacao</Text>
+              <Text style={typeStyles.section}>Estação</Text>
               <View style={styles.wrap}>
                 {SEASONS.map((entry) => (
                   <Chip
@@ -333,7 +353,7 @@ export default function AddItemScreen() {
 
           <View style={styles.footer}>
             <Button
-              label={editing ? 'Salvar alteracoes' : 'Adicionar ao closet'}
+              label={editing ? 'Salvar alterações' : 'Adicionar ao closet'}
               disabled={!canSave}
               onPress={save}
             />

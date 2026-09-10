@@ -40,7 +40,7 @@ export default function HomeScreen() {
   const addOutfit = useAppStore((s) => s.addOutfit);
   const wearOutfitToday = useAppStore((s) => s.wearOutfitToday);
 
-  // Indice para trocar a sugestao do dia sem recalcular tudo.
+  // Índice para trocar a sugestão do dia sem recalcular tudo.
   const [pick, setPick] = useState(0);
 
   const suggestions = useMemo(
@@ -73,7 +73,7 @@ export default function HomeScreen() {
 
   const recentOutfits = useMemo(() => outfits.slice(0, 6), [outfits]);
 
-  // Uma sugestao vira um unico look salvo, mesmo que a pessoa toque em
+  // Uma sugestão vira um único look salvo, mesmo que a pessoa toque em
   // "Abrir look" e depois em "Usei hoje" — senao acumula duplicata.
   const savedBySuggestion = useRef(new Map<string, string>());
 
@@ -109,7 +109,7 @@ export default function HomeScreen() {
         wordmark
         right={
           <PillButton
-            label="Peca"
+            label="Peça"
             icon={<Plus size={15} color={colors.ink} />}
             onPress={() => router.push('/add-item' as never)}
           />
@@ -128,16 +128,16 @@ export default function HomeScreen() {
           <Text style={typeStyles.bodyMuted}>
             {items.length === 0
               ? 'Vamos montar seu guarda-roupa.'
-              : `${stats.available} pecas prontas para usar hoje.`}
+              : `${stats.available} peças prontas para usar hoje.`}
           </Text>
         </Animated.View>
 
         {items.length === 0 ? (
           <EmptyState
             icon={<Shirt size={34} color={colors.inkFaint} strokeWidth={1.5} />}
-            title="Seu closet esta vazio"
-            description="Adicione a primeira peca com a camera ou a galeria. Em poucos minutos da para montar looks."
-            actionLabel="Adicionar peca"
+            title="Seu closet está vazio"
+            description="Adicione a primeira peça com a câmera ou a galeria. Em poucos minutos dá para montar looks."
+            actionLabel="Adicionar peça"
             onAction={() => router.push('/add-item' as never)}
             secondaryLabel="Carregar closet de exemplo"
             onSecondary={() => router.push('/profile' as never)}
@@ -197,7 +197,7 @@ export default function HomeScreen() {
               ) : (
                 <View style={styles.hero}>
                   <Text style={typeStyles.bodyMuted}>
-                    Todas as pecas combinaveis estao na lavanderia. Adicione mais
+                    Todas as peças combináveis estão na lavanderia. Adicione mais
                     itens ou espere alguns dias.
                   </Text>
                 </View>
@@ -210,7 +210,7 @@ export default function HomeScreen() {
             >
               <StatTile
                 value={String(stats.available)}
-                label="disponiveis"
+                label="disponíveis"
                 icon={<Shirt size={14} color={colors.inkSoft} />}
               />
               <StatTile
@@ -228,7 +228,7 @@ export default function HomeScreen() {
 
             <Animated.View entering={FadeInDown.delay(180).duration(400)}>
               <View style={styles.sectionHead}>
-                <Text style={typeStyles.headline}>Ideias para voce</Text>
+                <Text style={typeStyles.headline}>Ideias para você</Text>
                 <Pressable
                   onPress={() => router.push('/explore' as never)}
                   accessibilityRole="button"

@@ -4,9 +4,9 @@ import { garmentColors, type GarmentColorKey } from '@/theme/tokens';
 import type { Category } from '@/store/types';
 
 /**
- * Silhueta vetorial da peca. Serve para dois casos:
- * 1. peca sem foto (closet de exemplo, ou foto perdida);
- * 2. camadas da prova virtual, sobrepostas na foto de referencia.
+ * Silhueta vetorial da peça. Serve para dois casos:
+ * 1. peça sem foto (closet de exemplo, ou foto perdida);
+ * 2. camadas da prova virtual, sobrepostas na foto de referência.
  *
  * Mantem o app 100% offline: nenhuma imagem remota, nenhum asset binario.
  */
@@ -38,7 +38,7 @@ interface Props {
   category: Category;
   colorKey: GarmentColorKey;
   size?: number;
-  /** Suaviza a peca quando ela esta indisponivel. */
+  /** Suaviza a peça quando ela está indisponível. */
   dimmed?: boolean;
 }
 

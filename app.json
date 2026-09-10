@@ -11,8 +11,8 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "O bicloset usa a camera para fotografar as pecas do seu guarda-roupa.",
-        "NSPhotoLibraryUsageDescription": "O bicloset usa suas fotos para cadastrar pecas e a imagem de referencia da prova virtual."
+        "NSCameraUsageDescription": "O bicloset usa a câmera para fotografar as peças do seu guarda-roupa.",
+        "NSPhotoLibraryUsageDescription": "O bicloset usa suas fotos para cadastrar peças e a imagem de referência da prova virtual."
       }
     },
     "android": {
@@ -41,8 +41,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O bicloset usa suas fotos para cadastrar pecas e a imagem de referencia da prova virtual.",
-          "cameraPermission": "O bicloset usa a camera para fotografar as pecas do seu guarda-roupa."
+          "photosPermission": "O bicloset usa suas fotos para cadastrar peças e a imagem de referência da prova virtual.",
+          "cameraPermission": "O bicloset usa a câmera para fotografar as peças do seu guarda-roupa."
         }
       ]
     ],

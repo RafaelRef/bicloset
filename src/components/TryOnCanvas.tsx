@@ -9,15 +9,15 @@ import { colors, radius, space } from '@/theme/tokens';
 import { fonts } from '@/theme/typography';
 
 /**
- * Composicao local da prova virtual.
+ * Composição local da prova virtual.
  *
- * Enquanto `services/tryOn` estiver mockado, e este componente que produz o
- * "resultado": sobrepoe cada peca na zona do corpo correspondente sobre a foto
- * de referencia. Quando a integracao real entrar, `compositeUri` chega
- * preenchido e substitui as camadas por uma imagem unica.
+ * Enquanto `services/tryOn` estiver mockado, é este componente que produz o
+ * "resultado": sobrepoe cada peça na zona do corpo correspondente sobre a foto
+ * de referência. Quando a integracao real entrar, `compositeUri` chega
+ * preenchido e substitui as camadas por uma imagem única.
  */
 
-/** Retangulos em fracao do canvas — ajustados para uma foto de corpo inteiro. */
+/** Retângulos em fração do canvas — ajustados para uma foto de corpo inteiro. */
 const ZONE_RECTS: Record<BodyZone, { top: number; height: number; width: number }> = {
   head: { top: 0.04, height: 0.14, width: 0.26 },
   torso: { top: 0.2, height: 0.32, width: 0.54 },

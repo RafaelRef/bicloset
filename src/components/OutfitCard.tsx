@@ -59,7 +59,7 @@ export function OutfitCard({ outfit, items, onPress, width, height = 190 }: Prop
           {outfit.name}
         </Text>
         <Text style={styles.meta} numberOfLines={1}>
-          {[occasionLabel, `${items.length} pecas`]
+          {[occasionLabel, `${items.length} peças`]
             .filter(Boolean)
             .join(' · ')}
         </Text>

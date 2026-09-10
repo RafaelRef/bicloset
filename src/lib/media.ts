@@ -3,26 +3,40 @@ import { createId } from './id';
 
 /**
  * O image picker devolve um arquivo em cache, que o sistema pode limpar a
- * qualquer momento. Copiamos para o diretorio de documentos para que a foto
- * sobreviva entre sessoes.
+ * qualquer momento. Copiamos para o diretório de documentos para que a foto
+ * sobreviva entre sessões.
  */
 const MEDIA_DIR = `${FileSystem.documentDirectory}bicloset/`;
 
+async function ensureMediaDir(): Promise<void> {
+  const dir = await FileSystem.getInfoAsync(MEDIA_DIR);
+  if (!dir.exists) {
+    await FileSystem.makeDirectoryAsync(MEDIA_DIR, { intermediates: true });
+  }
+}
+
 export async function persistImage(uri: string): Promise<string> {
   try {
-    const dir = await FileSystem.getInfoAsync(MEDIA_DIR);
-    if (!dir.exists) {
-      await FileSystem.makeDirectoryAsync(MEDIA_DIR, { intermediates: true });
-    }
+    await ensureMediaDir();
     const ext = uri.split('?')[0].split('.').pop() || 'jpg';
     const dest = `${MEDIA_DIR}${createId('img')}.${ext}`;
     await FileSystem.copyAsync({ from: uri, to: dest });
     return dest;
   } catch {
-    // Se a copia falhar seguimos com o uri original: pior caso a imagem some
-    // depois, e a peca cai na silhueta vetorial.
+    // Se a cópia falhar seguimos com o uri original: pior caso a imagem some
+    // depois, e a peça cai na silhueta vetorial.
     return uri;
   }
+}
+
+/** Grava um PNG devolvido em base64 (resposta da remove.bg) como arquivo. */
+export async function saveBase64Image(base64: string, ext = 'png'): Promise<string> {
+  await ensureMediaDir();
+  const dest = `${MEDIA_DIR}${createId('cut')}.${ext}`;
+  await FileSystem.writeAsStringAsync(dest, base64, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+  return dest;
 }
 
 export async function deleteImage(uri: string | null): Promise<void> {
@@ -30,6 +44,6 @@ export async function deleteImage(uri: string | null): Promise<void> {
   try {
     await FileSystem.deleteAsync(uri, { idempotent: true });
   } catch {
-    // Arquivo ja removido — nada a fazer.
+    // Arquivo já removido — nada a fazer.
   }
 }

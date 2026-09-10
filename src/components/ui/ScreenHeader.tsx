@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radius, space } from '@/theme/tokens';
 import { fonts, type as typeStyles } from '@/theme/typography';
 
-/** Pilula branca com icone + rotulo, como "Search" / "+ Upload" no case. */
+/** Pilula branca com ícone + rótulo, como "Search" / "+ Upload" no case. */
 export function PillButton({
   label,
   icon,
@@ -64,7 +64,7 @@ interface HeaderProps {
   title: string;
   left?: ReactNode;
   right?: ReactNode;
-  /** Marca serifada no lugar do titulo (usada na Home). */
+  /** Marca serifada no lugar do título (usada na Home). */
   wordmark?: boolean;
 }
 

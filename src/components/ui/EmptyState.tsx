@@ -17,8 +17,8 @@ interface Props {
 }
 
 /**
- * Estado vazio: e a primeira tela que a pessoa ve em quase todo lugar, entao
- * carrega o convite principal em vez de so avisar que nao ha nada.
+ * Estado vazio: é a primeira tela que a pessoa ve em quase todo lugar, entao
+ * carrega o convite principal em vez de só avisar que não ha nada.
  */
 export function EmptyState({
   icon,

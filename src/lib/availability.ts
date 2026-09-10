@@ -3,15 +3,15 @@ import type { ClothingItem } from '@/store/types';
 
 export interface Availability {
   available: boolean;
-  /** Dias restantes ate a peca voltar ao guarda-roupa. 0 quando disponivel. */
+  /** Dias restantes até a peça voltar ao guarda-roupa. 0 quando disponível. */
   daysLeft: number;
-  /** Timestamp em que a peca volta a ficar disponivel. */
+  /** Timestamp em que a peça volta a ficar disponível. */
   readyAt: number | null;
 }
 
 /**
- * Uma peca fica indisponivel por `laundryDays` a partir do ultimo uso
- * confirmado, e volta sozinha assim que o periodo passa — nao existe acao
+ * Uma peça fica indisponível por `laundryDays` a partir do ultimo uso
+ * confirmado, e volta sozinha assim que o período passa — não existe ação
  * de "tirar da lavanderia", o tempo resolve.
  */
 export function getAvailability(

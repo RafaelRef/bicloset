@@ -4,14 +4,14 @@ import type { ClothingItem } from '@/store/types';
  * Prova virtual (virtual try-on).
  *
  * ─────────────────────────────────────────────────────────────────────────
- * MOCKADO. Nao existe modelo de difusao aqui: devolvemos uma "receita" de
- * composicao que o componente <TryOnCanvas> renderiza sobrepondo as pecas na
- * foto de referencia, por zona do corpo. O resultado e claramente marcado
+ * MOCKADO. Não existe modelo de difusao aqui: devolvemos uma "receita" de
+ * composição que o componente <TryOnCanvas> renderiza sobrepondo as peças na
+ * foto de referência, por zona do corpo. O resultado e claramente marcado
  * como Preview.
  *
  * TODO: integrar com Replicate (ex.: `cuuupid/idm-vton`) — precisa de API key
- * do usuario. Trocar apenas o corpo de `generateTryOn`; a assinatura
- * (foto da pessoa + pecas -> imagem combinada) ja e a final.
+ * do usuário. Trocar apenas o corpo de `generateTryOn`; a assinatura
+ * (foto da pessoa + peças -> imagem combinada) já é a final.
  *
  * Exemplo (Replicate):
  *   const res = await fetch('https://api.replicate.com/v1/predictions', {
@@ -36,14 +36,14 @@ export interface TryOnLayer {
 }
 
 export interface TryOnResult {
-  /** Imagem final combinada. null enquanto o servico estiver mockado. */
+  /** Imagem final combinada. null enquanto o serviço estiver mockado. */
   compositeUri: string | null;
-  /** Camadas para o fallback de composicao local. */
+  /** Camadas para o fallback de composição local. */
   layers: TryOnLayer[];
   mocked: boolean;
 }
 
-/** Mapeamento sincrono peca -> zona do corpo, compartilhado com o canvas. */
+/** Mapeamento síncrono peça -> zona do corpo, compartilhado com o canvas. */
 export function layersForItems(items: ClothingItem[]): TryOnLayer[] {
   return items.map(zoneFor).sort((a, b) => a.z - b.z);
 }
@@ -70,7 +70,7 @@ export async function generateTryOn(input: {
   personUri: string | null;
   items: ClothingItem[];
 }): Promise<TryOnResult> {
-  // Latencia artificial: a tela de prova mostra o estado "gerando".
+  // Latência artificial: a tela de prova mostra o estado "gerando".
   await new Promise((resolve) => setTimeout(resolve, 1400));
   return {
     compositeUri: null,

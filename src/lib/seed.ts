@@ -13,7 +13,7 @@ const base = {
 
 /**
  * Closet de exemplo para conhecer o app sem fotografar nada.
- * Sem imagens: cada peca cai na silhueta vetorial, entao continua offline.
+ * Sem imagens: cada peça cai na silhueta vetorial, entao continua offline.
  */
 export function buildDemoCloset(): DemoItem[] {
   return [
@@ -27,7 +27,7 @@ export function buildDemoCloset(): DemoItem[] {
 
     // Bottoms
     { ...base, name: 'Jeans reto', category: 'bottoms', colorKey: 'blue', occasions: ['casual', 'work'], seasons: ['autumn', 'winter', 'spring'] },
-    { ...base, name: 'Calca alfaiataria', category: 'bottoms', colorKey: 'black', occasions: ['work', 'party'], seasons: ['autumn', 'winter'] },
+    { ...base, name: 'Calça alfaiataria', category: 'bottoms', colorKey: 'black', occasions: ['work', 'party'], seasons: ['autumn', 'winter'] },
     { ...base, name: 'Saia plissada', category: 'bottoms', colorKey: 'beige', occasions: ['work', 'casual'], seasons: ['spring', 'summer'] },
     { ...base, name: 'Short de linho', category: 'bottoms', colorKey: 'white', occasions: ['casual', 'home'], seasons: ['summer'] },
     { ...base, name: 'Legging', category: 'bottoms', colorKey: 'black', occasions: ['sport', 'home'], seasons: ['autumn', 'winter', 'spring', 'summer'] },
@@ -42,12 +42,12 @@ export function buildDemoCloset(): DemoItem[] {
     { ...base, name: 'Trench coat', category: 'outerwear', colorKey: 'brown', occasions: ['work', 'casual'], seasons: ['winter'] },
 
     // Sapatos
-    { ...base, name: 'Tenis branco', category: 'shoes', colorKey: 'white', occasions: ['casual', 'sport'], seasons: ['spring', 'summer', 'autumn'] },
+    { ...base, name: 'Tênis branco', category: 'shoes', colorKey: 'white', occasions: ['casual', 'sport'], seasons: ['spring', 'summer', 'autumn'] },
     { ...base, name: 'Scarpin preto', category: 'shoes', colorKey: 'black', occasions: ['work', 'party'], seasons: ['autumn', 'winter', 'spring'] },
-    { ...base, name: 'Sandalia', category: 'shoes', colorKey: 'beige', occasions: ['casual', 'party'], seasons: ['summer'] },
+    { ...base, name: 'Sandália', category: 'shoes', colorKey: 'beige', occasions: ['casual', 'party'], seasons: ['summer'] },
     { ...base, name: 'Bota de couro', category: 'shoes', colorKey: 'brown', occasions: ['casual', 'work'], seasons: ['winter', 'autumn'] },
 
-    // Acessorios
+    // Acessórios
     { ...base, name: 'Bolsa estruturada', category: 'accessories', colorKey: 'black', occasions: ['work', 'party'], seasons: [] },
     { ...base, name: 'Bolsa de palha', category: 'accessories', colorKey: 'beige', occasions: ['casual'], seasons: ['summer'] },
     { ...base, name: 'Cinto marrom', category: 'accessories', colorKey: 'brown', occasions: ['work', 'casual'], seasons: [] },

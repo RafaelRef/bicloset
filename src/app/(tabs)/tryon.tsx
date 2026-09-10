@@ -20,7 +20,7 @@ import { CATEGORIES, type Category } from '@/store/types';
 import { colors, radius, shadow, space, TAB_BAR_HEIGHT } from '@/theme/tokens';
 import { fonts, type as typeStyles } from '@/theme/typography';
 
-/** Categorias que aceitam apenas uma peca por look. */
+/** Categorias que aceitam apenas uma peça por look. */
 const SINGLE_PICK: Category[] = ['tops', 'bottoms', 'dresses', 'outerwear', 'shoes'];
 
 export default function TryOnScreen() {
@@ -59,7 +59,7 @@ export default function TryOnScreen() {
     setSelectedIds((current) => {
       if (current.includes(id)) return current.filter((i) => i !== id);
       if (SINGLE_PICK.includes(item.category)) {
-        // Uma peca por zona: escolher outro top troca o anterior.
+        // Uma peça por zona: escolher outro top troca o anterior.
         const withoutSameCategory = current.filter(
           (existing) => itemsById.get(existing)?.category !== item.category,
         );
@@ -73,8 +73,8 @@ export default function TryOnScreen() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
-        'Permissao necessaria',
-        'Libere o acesso as fotos para escolher a imagem de referencia.',
+        'Permissão necessária',
+        'Libere o acesso às fotos para escolher a imagem de referência.',
       );
       return;
     }
@@ -122,8 +122,8 @@ export default function TryOnScreen() {
         <EmptyState
           icon={<WandSparkles size={32} color={colors.inkFaint} strokeWidth={1.5} />}
           title="Nada para provar ainda"
-          description="Cadastre algumas pecas no closet e volte aqui para montar o look sobre a sua foto."
-          actionLabel="Adicionar peca"
+          description="Cadastre algumas peças no closet e volte aqui para montar o look sobre a sua foto."
+          actionLabel="Adicionar peça"
           onAction={() => router.push('/add-item' as never)}
         />
       </SafeAreaView>
@@ -160,7 +160,7 @@ export default function TryOnScreen() {
           <Animated.View entering={FadeIn.duration(300)} style={styles.notice}>
             <Info size={14} color={colors.ai} />
             <Text style={styles.noticeText}>
-              Composicao local. A prova virtual com IA precisa de uma chave de API —
+              Composição local. A prova virtual com IA precisa de uma chave de API —
               veja o README.
             </Text>
           </Animated.View>
@@ -170,14 +170,14 @@ export default function TryOnScreen() {
           <Pressable onPress={pickModelPhoto} style={styles.hint}>
             <PersonStanding size={16} color={colors.inkSoft} />
             <Text style={typeStyles.bodyMuted}>
-              Escolha uma foto de corpo inteiro para ver o look sobre voce.
+              Escolha uma foto de corpo inteiro para ver o look sobre você.
             </Text>
           </Pressable>
         ) : null}
 
         <View>
           <View style={styles.sectionHead}>
-            <Text style={typeStyles.headline}>Escolha as pecas</Text>
+            <Text style={typeStyles.headline}>Escolha as peças</Text>
             <Text style={typeStyles.caption}>
               {selectedItems.length} selecionada
               {selectedItems.length === 1 ? '' : 's'}
@@ -198,7 +198,7 @@ export default function TryOnScreen() {
           <View style={styles.availabilityRow}>
             <Chip
               compact
-              label={showUnavailable ? 'Mostrando tudo' : 'So disponiveis'}
+              label={showUnavailable ? 'Mostrando tudo' : 'Só disponíveis'}
               selected={!showUnavailable}
               onPress={() => setShowUnavailable((v) => !v)}
             />
@@ -209,8 +209,8 @@ export default function TryOnScreen() {
               <Shirt size={20} color={colors.inkFaint} />
               <Text style={typeStyles.bodyMuted}>
                 {showUnavailable
-                  ? 'Nenhuma peca nesta categoria.'
-                  : 'Tudo nesta categoria esta na lavanderia.'}
+                  ? 'Nenhuma peça nesta categoria.'
+                  : 'Tudo nesta categoria está na lavanderia.'}
               </Text>
             </View>
           ) : (

@@ -49,7 +49,7 @@ export const type = StyleSheet.create({
     fontSize: 13,
     color: colors.ink,
   },
-  /** Rotulo de secao: pequeno, cinza, como "Type" / "Colour" no case. */
+  /** Rótulo de secao: pequeno, cinza, como "Type" / "Colour" no case. */
   section: {
     fontFamily: fonts.regular,
     fontSize: 12,

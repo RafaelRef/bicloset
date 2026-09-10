@@ -3,16 +3,16 @@ import { garmentColors, type GarmentColorKey } from '@/theme/tokens';
 import type { ClothingItem, Occasion, Season } from '@/store/types';
 
 /**
- * Motor de sugestao de looks.
+ * Motor de sugestão de looks.
  *
- * Roda 100% no dispositivo: pontua combinacoes por ocasiao, estacao, harmonia
- * de cor e "frescor" (pecas menos usadas primeiro). Nao e um modelo de IA e
- * nao precisa de rede — e o que alimenta as telas de Explorar e o look do dia
+ * Roda 100% no dispositivo: pontua combinações por ocasião, estáção, harmonia
+ * de cor e "frescor" (peças menos usadas primeiro). Não e um modelo de IA e
+ * não precisa de rede — é o que alimenta as telas de Explorar e o look do dia
  * enquanto a prova virtual continua mockada.
  */
 
 export interface Suggestion {
-  /** Determinstico para as mesmas pecas, serve como key de lista. */
+  /** Determinstico para as mesmas peças, serve como key de lista. */
   id: string;
   itemIds: string[];
   occasion: Occasion;
@@ -22,7 +22,7 @@ export interface Suggestion {
 
 const NEUTRALS: GarmentColorKey[] = ['black', 'grey', 'white', 'beige', 'brown'];
 
-/** Hemisferio sul: dezembro e verao. */
+/** Hemisfério sul: dezembro é verão. */
 export function currentSeason(date = new Date()): Season {
   const m = date.getMonth();
   if (m === 11 || m <= 1) return 'summer';
@@ -49,7 +49,7 @@ function seasonScore(item: ClothingItem, season: Season): number {
   return item.seasons.includes(season) ? 1 : -0.75;
 }
 
-/** Peca pouco usada vale mais — evita sugerir sempre a mesma combinacao. */
+/** Peça pouco usada vale mais — evita sugerir sempre a mesma combinação. */
 function freshnessScore(item: ClothingItem): number {
   return 2 - Math.min(item.wearCount, 4) / 2;
 }
@@ -88,7 +88,7 @@ function scoreCombo(
     score += seasonScore(item, season);
     score += freshnessScore(item);
   }
-  // Normaliza pelo tamanho para nao premiar looks so por terem mais pecas.
+  // Normaliza pelo tamanho para não premiar looks só por terem mais peças.
   return score / items.length;
 }
 
@@ -96,7 +96,7 @@ export interface SuggestOptions {
   occasion?: Occasion;
   limit?: number;
   season?: Season;
-  /** Ignora o periodo de lavagem (usado ao montar look manualmente). */
+  /** Ignora o período de lavagem (usado ao montar look manualmente). */
   includeUnavailable?: boolean;
 }
 
@@ -124,7 +124,7 @@ export function suggestOutfits(
   const results: Suggestion[] = [];
 
   for (const occ of occasions) {
-    // Limita cada categoria para manter a combinatoria previsivel.
+    // Limita cada categoria para manter a combinatória previsível.
     const relevant = pool
       .filter((i) => i.occasions.length === 0 || i.occasions.includes(occ))
       .sort((a, b) => freshnessScore(b) - freshnessScore(a));
@@ -139,7 +139,7 @@ export function suggestOutfits(
     for (const base of bases) {
       const combo = [...base];
       if (g.shoes.length > 0) {
-        // Sapato que melhor combina com a base ja escolhida.
+        // Sapato que melhor combina com a base já escolhida.
         const shoe = [...g.shoes]
           .sort(
             (a, b) =>
@@ -163,7 +163,7 @@ export function suggestOutfits(
     }
   }
 
-  // Dedupe por conjunto de pecas, mantendo o melhor score.
+  // Dedupe por conjunto de peças, mantendo o melhor score.
   const best = new Map<string, Suggestion>();
   for (const s of results) {
     const key = [...s.itemIds].sort().join('-');
@@ -173,7 +173,7 @@ export function suggestOutfits(
 
   const ranked = [...best.values()].sort((a, b) => b.score - a.score);
 
-  // Espalha o resultado: no maximo 2 sugestoes reutilizando a mesma peca-chave.
+  // Espalha o resultado: no máximo 2 sugestões reutilizando a mesma peça-chave.
   const usage = new Map<string, number>();
   const spread: Suggestion[] = [];
   for (const s of ranked) {
@@ -187,7 +187,7 @@ export function suggestOutfits(
   return spread;
 }
 
-/** Look do dia: a melhor sugestao para a ocasiao mais provavel. */
+/** Look do dia: a melhor sugestão para a ocasião mais provavel. */
 export function suggestOutfitOfTheDay(
   items: ClothingItem[],
   laundryDays: number,

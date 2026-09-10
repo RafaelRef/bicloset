@@ -61,7 +61,7 @@ export default function ProfileScreen() {
   const pickAvatar = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permissao necessaria', 'Libere o acesso as fotos para trocar o avatar.');
+      Alert.alert('Permissão necessária', 'Libere o acesso às fotos para trocar o avatar.');
       return;
     }
     const picked = await ImagePicker.launchImageLibraryAsync({
@@ -83,7 +83,7 @@ export default function ProfileScreen() {
   const loadDemo = () => {
     Alert.alert(
       'Carregar closet de exemplo',
-      'Adiciona 23 pecas ficticias para voce testar o app. Nao apaga o que ja existe.',
+      'Adiciona 23 peças fictícias para você testar o app. Não apaga o que já existe.',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -99,7 +99,7 @@ export default function ProfileScreen() {
   const confirmClear = () => {
     Alert.alert(
       'Apagar tudo',
-      'Remove todas as pecas, looks e planos. Nao da para desfazer.',
+      'Remove todas as peças, looks e planos. Não dá para desfazer.',
       [
         { text: 'Cancelar', style: 'cancel' },
         { text: 'Apagar', style: 'destructive', onPress: clearWardrobe },
@@ -140,7 +140,7 @@ export default function ProfileScreen() {
             onSubmitEditing={() => updateSettings({ ownerName: name.trim() })}
           />
           <Text style={typeStyles.bodyMuted}>
-            {items.length} pecas · {outfits.length} looks · {stats.worn} usos
+            {items.length} peças · {outfits.length} looks · {stats.worn} usos
           </Text>
         </Animated.View>
 
@@ -151,11 +151,11 @@ export default function ProfileScreen() {
               <View style={styles.rowLeft}>
                 <WashingMachine size={18} color={colors.laundry} />
                 <View style={styles.rowText}>
-                  <Text style={typeStyles.label}>Periodo de lavagem</Text>
+                  <Text style={typeStyles.label}>Período de lavagem</Text>
                   <Text style={typeStyles.caption}>
                     {settings.laundryDays === 0
-                      ? 'Desligado: pecas ficam sempre disponiveis'
-                      : `Pecas usadas somem por ${settings.laundryDays} dias`}
+                      ? 'Desligado: peças ficam sempre disponíveis'
+                      : `Peças usadas somem por ${settings.laundryDays} dias`}
                   </Text>
                 </View>
               </View>
@@ -181,18 +181,18 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.divider} />
             <Text style={typeStyles.bodyMuted}>
-              {stats.washing} peca{stats.washing === 1 ? '' : 's'} na lavanderia agora.
+              {stats.washing} peça{stats.washing === 1 ? '' : 's'} na lavanderia agora.
             </Text>
           </View>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(120).duration(400)}>
-          <Text style={[typeStyles.headline, styles.sectionTitle]}>Suas estatisticas</Text>
+          <Text style={[typeStyles.headline, styles.sectionTitle]}>Suas estatísticas</Text>
           <View style={styles.card}>
             {stats.mostWorn.length === 0 ? (
               <Text style={typeStyles.bodyMuted}>
                 Nenhum uso confirmado ainda. Marque um look como usado na Agenda para
-                comecar a contar.
+                começar a contar.
               </Text>
             ) : (
               <>
@@ -214,7 +214,7 @@ export default function ProfileScreen() {
                 ))}
                 <View style={styles.divider} />
                 <Text style={typeStyles.bodyMuted}>
-                  {stats.neverWorn} peca{stats.neverWorn === 1 ? '' : 's'} nunca usada
+                  {stats.neverWorn} peça{stats.neverWorn === 1 ? '' : 's'} nunca usada
                   {stats.neverWorn === 1 ? '' : 's'}.
                 </Text>
               </>
@@ -233,7 +233,7 @@ export default function ProfileScreen() {
             <View style={styles.divider} />
             <Pressable style={styles.actionRow} onPress={() => router.push('/explore' as never)}>
               <Sparkles size={17} color={colors.ai} />
-              <Text style={styles.actionLabel}>Ver sugestoes de look</Text>
+              <Text style={styles.actionLabel}>Ver sugestões de look</Text>
               <ChevronRight size={17} color={colors.inkFaint} />
             </Pressable>
             <View style={styles.divider} />
@@ -250,8 +250,8 @@ export default function ProfileScreen() {
         <Animated.View entering={FadeInDown.delay(240).duration(400)} style={styles.about}>
           <Info size={14} color={colors.inkSoft} />
           <Text style={styles.aboutText}>
-            A prova virtual e a remocao de fundo estao mockadas nesta versao: rodam
-            localmente, sem chamar nenhum servico de IA. O README explica quais chaves
+            A prova virtual e a remoção de fundo estão mockadas nesta versão: rodam
+            localmente, sem chamar nenhum serviço de IA. O README explica quais chaves
             de API ativam as duas de verdade.
           </Text>
         </Animated.View>

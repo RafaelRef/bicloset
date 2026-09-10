@@ -15,7 +15,7 @@ interface Props {
   footer?: ReactNode;
 }
 
-/** Bottom sheet branco com titulo a esquerda e X a direita, como no case. */
+/** Bottom sheet branco com título a esquerda e X a direita, como no case. */
 export function Sheet({ visible, onClose, title, children, footer }: Props) {
   const insets = useSafeAreaInsets();
 

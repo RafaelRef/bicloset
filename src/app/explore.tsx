@@ -67,7 +67,7 @@ export default function ExploreScreen() {
         right={
           <IconCircle
             icon={<RefreshCw size={16} color={colors.ink} />}
-            accessibilityLabel="Gerar outras sugestoes"
+            accessibilityLabel="Gerar outras sugestões"
             onPress={() => setRefreshKey((k) => k + 1)}
           />
         }
@@ -83,7 +83,7 @@ export default function ExploreScreen() {
         ListHeaderComponent={
           <View style={styles.header}>
             <Text style={typeStyles.bodyMuted}>
-              Combinacoes montadas com as pecas disponiveis no seu closet.
+              Combinações montadas com as peças disponíveis no seu closet.
             </Text>
             <ChipRow paddingHorizontal={0}>
               <Chip
@@ -137,13 +137,13 @@ export default function ExploreScreen() {
         ListEmptyComponent={
           <EmptyState
             icon={<Sparkles size={32} color={colors.inkFaint} strokeWidth={1.5} />}
-            title={items.length === 0 ? 'Closet vazio' : 'Sem combinacoes agora'}
+            title={items.length === 0 ? 'Closet vazio' : 'Sem combinações agora'}
             description={
               items.length === 0
-                ? 'Cadastre pecas para o bicloset comecar a sugerir looks.'
-                : 'Faltam pecas disponiveis para montar um look completo. Espere sair da lavanderia ou cadastre mais itens.'
+                ? 'Cadastre peças para o bicloset começar a sugerir looks.'
+                : 'Faltam peças disponíveis para montar um look completo. Espere sair da lavanderia ou cadastre mais itens.'
             }
-            actionLabel="Adicionar peca"
+            actionLabel="Adicionar peça"
             onAction={() => router.push('/add-item' as never)}
           />
         }

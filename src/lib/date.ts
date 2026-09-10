@@ -3,7 +3,7 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
 export const WEEKDAY_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export const MONTH_LABELS = [
-  'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho',
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ];
 
@@ -37,7 +37,7 @@ export function isSameDay(a: Date, b: Date): boolean {
 }
 
 /**
- * Matriz do mes comecando no domingo. Celulas fora do mes vem como null para
+ * Matriz do mês comecando no domingo. Celulas fora do mês vem como null para
  * que o grid mantenha 7 colunas sem dias de outros meses competindo visualmente.
  */
 export function monthMatrix(year: number, month: number): (Date | null)[][] {
@@ -55,13 +55,13 @@ export function monthMatrix(year: number, month: number): (Date | null)[][] {
   return weeks;
 }
 
-/** "Hoje", "Amanha", "Ontem" ou "12 de Marco". */
+/** "Hoje", "Amanhã", "Ontem" ou "12 de Março". */
 export function friendlyDate(date: Date, today = new Date()): string {
   const diff = Math.round(
     (startOfDay(date).getTime() - startOfDay(today).getTime()) / DAY_MS,
   );
   if (diff === 0) return 'Hoje';
-  if (diff === 1) return 'Amanha';
+  if (diff === 1) return 'Amanhã';
   if (diff === -1) return 'Ontem';
   return `${date.getDate()} de ${MONTH_LABELS[date.getMonth()]}`;
 }

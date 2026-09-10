@@ -24,17 +24,17 @@ const STEPS = [
   {
     Icon: Shirt,
     title: 'Seu guarda-roupa, digital',
-    body: 'Fotografe suas pecas e monte o closet em minutos. Tudo organizado por categoria, cor e ocasiao.',
+    body: 'Fotografe suas peças e monte o closet em minutos. Tudo organizado por categoria, cor e ocasião.',
   },
   {
     Icon: WandSparkles,
     title: 'Prove antes de vestir',
-    body: 'Combine pecas sobre a sua foto de referencia e veja o look montado antes de sair do quarto.',
+    body: 'Combine peças sobre a sua foto de referência e veja o look montado antes de sair do quarto.',
   },
   {
     Icon: CalendarDays,
     title: 'Planeje a semana',
-    body: 'Marque o look de cada dia. Ao confirmar que usou, as pecas entram no periodo de lavagem sozinhas.',
+    body: 'Marque o look de cada dia. Ao confirmar que usou, as peças entram no período de lavagem sozinhas.',
   },
 ];
 
@@ -97,7 +97,7 @@ export default function Onboarding() {
       </View>
 
       <View style={styles.actions}>
-        <Button label={isLast ? 'Comecar' : 'Continuar'} onPress={handleNext} />
+        <Button label={isLast ? 'Começar' : 'Continuar'} onPress={handleNext} />
         {!isLast ? (
           <Button label="Pular" variant="ghost" onPress={handleSkip} />
         ) : null}
