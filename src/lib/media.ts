@@ -1,5 +1,9 @@
 import * as FileSystem from 'expo-file-system/legacy';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { createId } from './id';
+
+/** Acima disso não ganha nada: a remove.bg devolve 0,25 MP no plano grátis. */
+const MAX_UPLOAD_WIDTH = 1600;
 
 /**
  * O image picker devolve um arquivo em cache, que o sistema pode limpar a
@@ -15,12 +19,43 @@ async function ensureMediaDir(): Promise<void> {
   }
 }
 
+/**
+ * Converte para JPEG e limita a largura.
+ *
+ * O iPhone salva as fotos em HEIC, que a remove.bg recusa com "invalid file
+ * type" — e HEIC também não é universal para exibir. Normalizar aqui resolve
+ * os dois de uma vez, e de quebra corta o tamanho do upload.
+ */
+export async function toUploadableJpeg(uri: string): Promise<string> {
+  const context = ImageManipulator.manipulate(uri);
+  const rendered = await context.renderAsync();
+
+  if (rendered.width > MAX_UPLOAD_WIDTH) {
+    const resized = ImageManipulator.manipulate(uri);
+    resized.resize({ width: MAX_UPLOAD_WIDTH });
+    const output = await resized.renderAsync();
+    const saved = await output.saveAsync({
+      format: SaveFormat.JPEG,
+      compress: 0.85,
+    });
+    return saved.uri;
+  }
+
+  const saved = await rendered.saveAsync({
+    format: SaveFormat.JPEG,
+    compress: 0.9,
+  });
+  return saved.uri;
+}
+
 export async function persistImage(uri: string): Promise<string> {
   try {
     await ensureMediaDir();
-    const ext = uri.split('?')[0].split('.').pop() || 'jpg';
+    // Normaliza antes de guardar: o que fica no closet é sempre JPEG.
+    const normalized = await toUploadableJpeg(uri).catch(() => uri);
+    const ext = normalized === uri ? uri.split('?')[0].split('.').pop() || 'jpg' : 'jpg';
     const dest = `${MEDIA_DIR}${createId('img')}.${ext}`;
-    await FileSystem.copyAsync({ from: uri, to: dest });
+    await FileSystem.copyAsync({ from: normalized, to: dest });
     return dest;
   } catch {
     // Se a cópia falhar seguimos com o uri original: pior caso a imagem some

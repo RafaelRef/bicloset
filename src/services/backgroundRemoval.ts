@@ -1,4 +1,8 @@
-import { readImageAsBase64, saveBase64Image } from '@/lib/media';
+import {
+  readImageAsBase64,
+  saveBase64Image,
+  toUploadableJpeg,
+} from '@/lib/media';
 
 /**
  * Remoção de fundo da foto da peça, via API da remove.bg.
@@ -73,7 +77,11 @@ export async function removeBackground(
     // Corpo JSON com a imagem em base64, e não multipart: a FormData do React
     // Native novo é spec-compliant e rejeita o objeto {uri, name, type} com
     // "Unsupported FormDataPart implementation".
-    const imageBase64 = await readImageAsBase64(uri);
+    // Reconverte mesmo que a foto já esteja no closet: peças cadastradas antes
+    // desta normalização existir ainda estão em HEIC, que a remove.bg recusa
+    // com "invalid file type".
+    const jpegUri = await toUploadableJpeg(uri);
+    const imageBase64 = await readImageAsBase64(jpegUri);
 
     const response = await fetch(ENDPOINT, {
       method: 'POST',
