@@ -83,19 +83,35 @@ Quem abrir o app recebe na próxima vez que fechar e abrir.
 
 Três detalhes que quebram se forem mexidos:
 
-- **`runtimeVersion` precisa ser `"exposdk:54.0.0"`** em `app.json`, e o projeto
-  precisa ficar na **SDK 54**. O Expo Go só carrega updates com o runtime da SDK dele,
-  e **o Expo Go da App Store para na SDK 54** — a partir da 55 não existe versão na
-  loja para iPhone. Subir a SDK do projeto sem uma conta Apple paga deixa o app
-  impossível de abrir no celular: o manifest responde 204 e o Expo Go mostra
-  "No launchable updates found in database". A policy `appVersion` que o
+- **`runtimeVersion` tem que casar com a SDK do Expo Go instalado no celular.**
+  Hoje é `"exposdk:58.0.0"`, com o projeto na SDK 58. O Expo Go só carrega update
+  cujo runtime é igual ao dele; se não bater, o manifest responde **204** e o app
+  mostra "No launchable updates found in database" — erro que parece de link
+  quebrado, mas é de versão. Para descobrir em que SDK está o Expo Go publicado
+  nas lojas, use o campo `expoGoSdkVersion`:
+
+  ```bash
+  curl -s https://api.expo.dev/v2/versions/latest | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['expoGoSdkVersion'])"
+  ```
+
+  Essa é a fonte confiável. A página de troubleshooting da Expo afirma que o Expo Go
+  da App Store "para na SDK 54"; isso está **desatualizado** e já custou um
+  rebaixamento inteiro de SDK à toa. Quando o Expo Go subir de SDK, o projeto
+  precisa subir junto e republicar. A policy `appVersion` que o
   `eas update:configure` deixa por padrão só serve para build standalone.
+
+  Para checar o que o canal serve hoje, sem depender do celular:
+
+  ```bash
+  curl -s -o /dev/null -w "%{http_code}\n" \
+    -H "expo-platform: ios" -H "expo-runtime-version: exposdk:58.0.0" \
+    -H "expo-channel-name: production" -H "expo-protocol-version: 1" \
+    https://u.expo.dev/8a65535f-f740-48b0-a1d5-ebdbebbb742e
+  ```
+
+  200 = tem update para esse runtime. 204 = não tem, e o app não abre.
 - **`web.output` precisa ser `"single"`**. Com `"static"` o export renderiza em Node e
-  quebra com `window is not defined`. Mesmo assim o **build web está quebrado na SDK 54**:
-  o `zustand` usa `import.meta.env` no middleware de devtools e o Metro da 54 não
-  transforma isso, então a página abre em branco com `Cannot use 'import.meta' outside a
-  module`. Só afeta `npm run web` — o bundle iOS gera normal. Para consertar seria preciso
-  um `babel.config.js` com `babel-plugin-transform-import-meta`.
+  quebra com `window is not defined`.
 - **O canal `production` precisa existir** e apontar para a branch de mesmo nome,
   senão o manifest responde 404 (`eas channel:create production`).
 
@@ -193,7 +209,7 @@ próprio para a chave não sair da sua máquina.
 
 ## Stack
 
-- **Expo SDK 54** + **Expo Router** (rotas por arquivo, em `src/app`)
+- **Expo SDK 58** + **Expo Router** (rotas por arquivo, em `src/app`)
 - **TypeScript** estrito
 - **Zustand** + `persist` sobre **AsyncStorage** (offline, sem backend)
 - **react-native-reanimated** para as transições
