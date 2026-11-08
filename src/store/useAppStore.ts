@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { createId } from '@/lib/id';
 import { dateKey, keyToDate } from '@/lib/date';
-import { deleteImage } from '@/lib/media';
+import { deleteImage, reanchorMediaUri } from '@/lib/media';
 import type { ClothingItem, Occasion, Outfit, PlanEntry, Settings } from './types';
 
 const DEFAULT_SETTINGS: Settings = {
@@ -259,9 +259,23 @@ export const useAppStore = create<AppState>()(
       onRehydrateStorage: () => (state) => {
         useAppStore.setState({ hydrated: true });
         if (state) {
+          // Reancora as fotos antes do primeiro render: o caminho gravado
+          // aponta para o container anterior sempre que o Expo Go se atualiza.
+          const repaired = state.items.map((item) => ({
+            ...item,
+            imageUri: reanchorMediaUri(item.imageUri),
+            originalUri: reanchorMediaUri(item.originalUri),
+          }));
           // Recalcula na abertura: o período de lavagem depende do relogio.
-          const { items, outfits } = recomputeWear(state.items, state.outfits, state.plans);
-          useAppStore.setState({ items, outfits });
+          const { items, outfits } = recomputeWear(repaired, state.outfits, state.plans);
+          useAppStore.setState({
+            items,
+            outfits,
+            settings: {
+              ...state.settings,
+              avatarUri: reanchorMediaUri(state.settings.avatarUri),
+            },
+          });
         }
       },
     },

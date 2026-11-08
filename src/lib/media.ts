@@ -10,7 +10,35 @@ const MAX_UPLOAD_WIDTH = 1600;
  * qualquer momento. Copiamos para o diretório de documentos para que a foto
  * sobreviva entre sessões.
  */
-const MEDIA_DIR = `${FileSystem.documentDirectory}bicloset/`;
+const MEDIA_DIR_NAME = 'bicloset';
+const MEDIA_DIR = `${FileSystem.documentDirectory}${MEDIA_DIR_NAME}/`;
+
+/**
+ * Reancora um caminho de foto no diretório de documentos vigente.
+ *
+ * No iOS o container do app ganha um UUID novo a cada atualização ou
+ * reinstalação — e, rodando no Expo Go, isso acontece toda vez que o *Expo Go*
+ * se atualiza pela App Store. Os arquivos são migrados junto, com o mesmo nome,
+ * mas o caminho absoluto gravado no AsyncStorage continua apontando para o
+ * container antigo, que não existe mais. Resultado: a peça sobrevive e a foto
+ * some, caindo na silhueta vetorial.
+ *
+ * Como o nome do arquivo é preservado, basta reancorar o que está sob
+ * `.../Documents/bicloset/` no `documentDirectory` de agora. Roda a cada
+ * hidratação, então o conserto é automático também nas próximas atualizações.
+ */
+export function reanchorMediaUri(uri: string | null): string | null {
+  // Só mexe em arquivo local nosso: uma URL remota pode conter /bicloset/ no
+  // caminho e não deve virar caminho de disco.
+  if (!uri || !FileSystem.documentDirectory || !uri.startsWith('file://')) return uri;
+  const marker = `/${MEDIA_DIR_NAME}/`;
+  const at = uri.lastIndexOf(marker);
+  if (at === -1) return uri;
+  const filename = uri.slice(at + marker.length);
+  if (!filename || filename.includes('/')) return uri;
+  const reanchored = `${MEDIA_DIR}${filename}`;
+  return reanchored === uri ? uri : reanchored;
+}
 
 async function ensureMediaDir(): Promise<void> {
   const dir = await FileSystem.getInfoAsync(MEDIA_DIR);
